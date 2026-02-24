@@ -1,7 +1,13 @@
 {
   description = "A Nix-flake-based Go development environment";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1"; # unstable Nixpkgs
+  inputs = {
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1"; # unstable Nixpkgs
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
   outputs =
     { self, ... }@inputs:
@@ -24,6 +30,7 @@
               inherit system;
               overlays = [ inputs.self.overlays.default ];
             };
+            inherit system;
           }
         );
     in
@@ -32,10 +39,23 @@
         go = final."go_1_${toString goVersion}";
       };
 
+      checks = forEachSupportedSystem (
+        { pkgs, system }:
+        {
+          git-hooks = inputs.git-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              commitizen.enable = true;
+            };
+          };
+        }
+      );
+
       devShells = forEachSupportedSystem (
-        { pkgs }:
+        { pkgs, system }:
         {
           default = pkgs.mkShellNoCC {
+            inherit (self.checks.${system}.git-hooks) shellHook;
             packages = with pkgs; [
               # go (version is specified by overlay)
               go
