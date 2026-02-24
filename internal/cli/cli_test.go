@@ -15,7 +15,30 @@ func TestRunNoArgs(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for no args")
 	}
-	if !strings.Contains(stderr.String(), "usage:") {
+	if !strings.Contains(stderr.String(), "Usage:") {
+		t.Errorf("expected usage in stderr, got: %q", stderr.String())
+	}
+}
+
+func TestRunVersion(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	err := Run([]string{"--version"}, &stdout, &stderr)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(stdout.String(), "repiq") {
+		t.Errorf("expected version output, got: %q", stdout.String())
+	}
+}
+
+func TestRunHelp(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	err := Run([]string{"--help"}, &stdout, &stderr)
+	// --help causes flag.ErrHelp
+	if err == nil {
+		t.Fatal("expected error for --help")
+	}
+	if !strings.Contains(stderr.String(), "Usage:") {
 		t.Errorf("expected usage in stderr, got: %q", stderr.String())
 	}
 }

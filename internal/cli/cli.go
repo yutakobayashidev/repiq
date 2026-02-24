@@ -15,6 +15,9 @@ import (
 	ghprovider "github.com/yutakobayashidev/repiq/internal/provider/github"
 )
 
+// Version is set at build time via ldflags.
+var Version = "dev"
+
 const timeout = 30 * time.Second
 
 // Run executes the CLI with the given arguments.
@@ -25,14 +28,34 @@ func Run(args []string, stdout, stderr io.Writer) error {
 	jsonFlag := fs.Bool("json", false, "output as JSON array (default)")
 	ndjsonFlag := fs.Bool("ndjson", false, "output as newline-delimited JSON")
 	markdownFlag := fs.Bool("markdown", false, "output as Markdown table")
+	versionFlag := fs.Bool("version", false, "print version and exit")
+
+	fs.Usage = func() {
+		fmt.Fprintln(stderr, "Usage: repiq [flags] <scheme>:<identifier> [...]")
+		fmt.Fprintln(stderr)
+		fmt.Fprintln(stderr, "Fetch objective metrics for OSS libraries and repositories.")
+		fmt.Fprintln(stderr)
+		fmt.Fprintln(stderr, "Examples:")
+		fmt.Fprintln(stderr, "  repiq github:facebook/react")
+		fmt.Fprintln(stderr, "  repiq --ndjson github:facebook/react github:vuejs/core")
+		fmt.Fprintln(stderr, "  repiq --markdown github:golang/go")
+		fmt.Fprintln(stderr)
+		fmt.Fprintln(stderr, "Flags:")
+		fs.PrintDefaults()
+	}
 
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
 
+	if *versionFlag {
+		fmt.Fprintf(stdout, "repiq %s\n", Version)
+		return nil
+	}
+
 	targets := fs.Args()
 	if len(targets) == 0 {
-		fmt.Fprintln(stderr, "usage: repiq <scheme>:<identifier> [...]")
+		fs.Usage()
 		return fmt.Errorf("no targets specified")
 	}
 
