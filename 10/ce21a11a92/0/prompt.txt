@@ -1,0 +1,462 @@
+# Open Command
+
+Define what this app is about and set the foundation for all future Epics.
+
+This is the very first step: open the restaurant — decide what kind of place this is.
+
+## When to Use
+
+- Starting a new project from scratch
+- No `docs/specs/overview.md` exists yet
+- Updating the app's overall direction
+
+## Workflow
+
+### Step 1: Investigate Existing State
+
+Use Grep, Glob, Read to understand:
+
+- Does a codebase already exist? What does it do?
+- Is there existing documentation (README, CLAUDE.md, etc.)?
+- What technologies, frameworks, patterns are in use?
+
+If `docs/specs/overview.md` already exists, read it and ask if user wants to update.
+
+### Step 2: Clarify Vision
+
+Use AskUserQuestion iteratively:
+
+- 2-4 questions per round
+- 2-4 concrete options per question
+- Focus categories:
+  - **What**: What is this app? Who is it for?
+  - **Why**: What problem does it solve? Why does it matter?
+  - **Vision**: Where is this heading in 6-12 months?
+  - **Constraints**: Technical constraints, team size, timeline
+  - **Differentiation**: What makes this different from alternatives?
+  - **Epics**: What are the major feature areas to build? What order?
+
+Keep iterating until the app's identity, direction, and candidate Epics are clear.
+
+### Step 3: Generate App-Level Spec
+
+Create `docs/specs/` with 2 files:
+
+```
+docs/specs/
+├── overview.md
+└── scope.md
+```
+
+#### overview.md
+
+```markdown
+# <App Name>
+
+## What is This
+
+<!-- 1-2 sentence description of the app -->
+
+## Who is This For
+
+<!-- Target users, personas -->
+
+## Problem
+
+<!-- What pain point does this solve? -->
+
+## Vision
+
+<!-- Where is this heading? 6-12 month direction -->
+
+## Principles
+
+<!-- 3-5 guiding principles for decision-making -->
+
+-
+```
+
+#### scope.md
+
+```markdown
+# Scope: <App Name>
+
+## Current Phase
+
+<!-- What phase is the project in? (ideation / MVP / growth / mature) -->
+
+## In Scope (this phase)
+
+-
+
+## Out of Scope (this phase)
+
+-
+
+## Technical Constraints
+
+<!-- Frameworks, infrastructure, team capacity -->
+
+-
+
+## Success Criteria
+
+-
+
+## Recommended Epics
+
+<!-- Based on the vision and scope above, list candidate Epics to build. -->
+<!-- PM picks from this list when running /kitchen:menu. -->
+
+| Priority | Epic (slug) | One-line description | Why |
+| -------- | ----------- | -------------------- | --- |
+| P0       |             |                      |     |
+| P1       |             |                      |     |
+| P2       |             |                      |     |
+```
+
+### Step 4: User Confirmation
+
+Present generated files for review. Handle modifications if requested.
+
+## Rules
+
+- Always respond in the user's language
+- Read existing code and docs BEFORE asking questions
+- Limit each AskUserQuestion to 2-4 questions
+- Provide 2-4 concrete options per question
+- This is app-level — do NOT write detailed feature specs (that is `/kitchen:menu`)
+- scope.md must include a "Recommended Epics" table so PM knows what to `/kitchen:menu` next
+- Always request user confirmation after generating files
+
+## Next Step
+
+Pick the highest-priority Epic from scope.md's "Recommended Epics" table and run `/kitchen:menu <epic>` to create its spec.
+
+---
+
+Markdownの表を出力する機能は欲しいかも、人間用に
+
+---
+
+# Menu Command
+
+Create a lightweight epic-level spec for the initiative described in ``.
+
+This is the PM's first step: define WHAT to build and WHY.
+
+## Workflow
+
+### Step 0: Check Current Branch
+
+Run `git branch --show-current` and present the current branch to the user via AskUserQuestion. Ask whether to proceed on the current branch or switch first. The worktree in Step 3 will branch from whatever branch you are on.
+
+### Step 1: Investigate Codebase
+
+Use Grep, Glob, Read to understand:
+
+- Existing features related to this initiative
+- Current architecture and patterns
+- Potential impact areas
+
+### Step 2: Clarify Requirements
+
+Use AskUserQuestion iteratively:
+
+- 2-4 questions per round
+- 2-4 concrete options per question
+- Focus categories:
+  - **Why**: Business reason for this initiative
+  - **Hypothesis**: What we expect to validate
+  - **Scope**: What to include / exclude
+  - **Users**: Target users, personas
+  - **Success criteria**: How we measure success
+  - **Risks**: What could go wrong
+
+Keep iterating until Why, hypothesis, and scope are clear.
+
+### Step 3: Create Worktree & Spec Directory
+
+Create a git worktree for this epic so all subsequent work is isolated:
+
+```bash
+git worktree add ../worktrees/<epic> -b feature/<epic>
+```
+
+Then inside the worktree, create `docs/specs/<epic>/` with 2 files:
+
+```
+docs/specs/<epic>/
+├── overview.md
+└── scope.md
+```
+
+`<epic>` is a slug derived from user input (e.g., "PDF export feature" -> `pdf-export`).
+
+#### overview.md
+
+```markdown
+# <Epic Name>
+
+## Summary
+
+<!-- 1-2 sentence project overview -->
+
+## Background & Purpose
+
+<!-- Why is this project needed? User pain points, business rationale -->
+
+## Why Now
+
+<!-- Urgency, timing rationale -->
+
+## Hypothesis
+
+<!-- What we want to validate. Use "If we <action>, then <outcome>" format -->
+
+- Hypothesis 1:
+- Hypothesis 2:
+
+## Expected Outcome
+
+<!-- What we gain if hypotheses are correct -->
+```
+
+#### scope.md
+
+```markdown
+# Scope: <Epic Name>
+
+## In Scope
+
+-
+
+## Out of Scope
+
+-
+
+## Success Criteria (KPI)
+
+### Expected to Improve
+
+-
+
+### At Risk (may decrease)
+
+-
+
+## Acceptance Gates
+
+<!-- Conditions for PM to approve release -->
+
+- [ ]
+
+## Experiment Info (if applicable)
+
+- Flag name:
+- Variants:
+- Traffic split %:
+```
+
+### Step 4: User Confirmation
+
+Present generated files for review. Handle modifications if requested.
+
+## Rules
+
+- Always respond in the user's language
+- Read existing code BEFORE asking questions
+- Limit each AskUserQuestion to 2-4 questions
+- Provide 2-4 concrete options per question
+- Do NOT create requirements.md or design.md — that is the engineer's job (done by the recipe agent)
+- Always request user confirmation after generating files
+
+## Next Step
+
+Switch to the worktree (`cd ../worktrees/<epic>`) and run `/kitchen:order` to create an Epic Issue from this spec.
+
+---
+
+[Request interrupted by user]
+
+---
+
+# Menu Command
+
+Create a lightweight epic-level spec for the initiative described in `core`.
+
+This is the PM's first step: define WHAT to build and WHY.
+
+## Workflow
+
+### Step 0: Check Current Branch
+
+Run `git branch --show-current` and present the current branch to the user via AskUserQuestion. Ask whether to proceed on the current branch or switch first. The worktree in Step 3 will branch from whatever branch you are on.
+
+### Step 1: Investigate Codebase
+
+Use Grep, Glob, Read to understand:
+
+- Existing features related to this initiative
+- Current architecture and patterns
+- Potential impact areas
+
+### Step 2: Clarify Requirements
+
+Use AskUserQuestion iteratively:
+
+- 2-4 questions per round
+- 2-4 concrete options per question
+- Focus categories:
+  - **Why**: Business reason for this initiative
+  - **Hypothesis**: What we expect to validate
+  - **Scope**: What to include / exclude
+  - **Users**: Target users, personas
+  - **Success criteria**: How we measure success
+  - **Risks**: What could go wrong
+
+Keep iterating until Why, hypothesis, and scope are clear.
+
+### Step 3: Create Worktree & Spec Directory
+
+Create a git worktree for this epic so all subsequent work is isolated:
+
+```bash
+git worktree add ../worktrees/<epic> -b feature/<epic>
+```
+
+Then inside the worktree, create `docs/specs/<epic>/` with 2 files:
+
+```
+docs/specs/<epic>/
+├── overview.md
+└── scope.md
+```
+
+`<epic>` is a slug derived from user input (e.g., "PDF export feature" -> `pdf-export`).
+
+#### overview.md
+
+```markdown
+# <Epic Name>
+
+## Summary
+
+<!-- 1-2 sentence project overview -->
+
+## Background & Purpose
+
+<!-- Why is this project needed? User pain points, business rationale -->
+
+## Why Now
+
+<!-- Urgency, timing rationale -->
+
+## Hypothesis
+
+<!-- What we want to validate. Use "If we <action>, then <outcome>" format -->
+
+- Hypothesis 1:
+- Hypothesis 2:
+
+## Expected Outcome
+
+<!-- What we gain if hypotheses are correct -->
+```
+
+#### scope.md
+
+```markdown
+# Scope: <Epic Name>
+
+## In Scope
+
+-
+
+## Out of Scope
+
+-
+
+## Success Criteria (KPI)
+
+### Expected to Improve
+
+-
+
+### At Risk (may decrease)
+
+-
+
+## Acceptance Gates
+
+<!-- Conditions for PM to approve release -->
+
+- [ ]
+
+## Experiment Info (if applicable)
+
+- Flag name:
+- Variants:
+- Traffic split %:
+```
+
+### Step 4: User Confirmation
+
+Present generated files for review. Handle modifications if requested.
+
+## Rules
+
+- Always respond in the user's language
+- Read existing code BEFORE asking questions
+- Limit each AskUserQuestion to 2-4 questions
+- Provide 2-4 concrete options per question
+- Do NOT create requirements.md or design.md — that is the engineer's job (done by the recipe agent)
+- Always request user confirmation after generating files
+
+## Next Step
+
+Switch to the worktree (`cd ../worktrees/<epic>`) and run `/kitchen:order` to create an Epic Issue from this spec.
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+続けて
+
+---
+
+よくよく考えたけど、違うidentifier同士で比較された場合どすいたらいいんだろ？
+
+---
+
+ベストプラクティスはなんだろう
+
+---
+
+kubectl get pods,servicesって何？
+
+---
+
+じゃあそうしよう
+
+---
+
+じゃあして
+
+---
+
+[Request interrupted by user]
+
+---
+
+docsは一旦コミットせず、specはPRにしたい
+
+---
+
+一旦mainに戻り、commitlintでfeatとかのよくあるやつの規約を守るようにしてほしい、flakeで設定できる？
+
+---
+
+gitleaksもおねがい
