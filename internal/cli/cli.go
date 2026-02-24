@@ -31,16 +31,17 @@ func Run(args []string, stdout, stderr io.Writer) error {
 	versionFlag := fs.Bool("version", false, "print version and exit")
 
 	fs.Usage = func() {
-		fmt.Fprintln(stderr, "Usage: repiq [flags] <scheme>:<identifier> [...]")
-		fmt.Fprintln(stderr)
-		fmt.Fprintln(stderr, "Fetch objective metrics for OSS libraries and repositories.")
-		fmt.Fprintln(stderr)
-		fmt.Fprintln(stderr, "Examples:")
-		fmt.Fprintln(stderr, "  repiq github:facebook/react")
-		fmt.Fprintln(stderr, "  repiq --ndjson github:facebook/react github:vuejs/core")
-		fmt.Fprintln(stderr, "  repiq --markdown github:golang/go")
-		fmt.Fprintln(stderr)
-		fmt.Fprintln(stderr, "Flags:")
+		_, _ = io.WriteString(stderr, `Usage: repiq [flags] <scheme>:<identifier> [...]
+
+Fetch objective metrics for OSS libraries and repositories.
+
+Examples:
+  repiq github:facebook/react
+  repiq --ndjson github:facebook/react github:vuejs/core
+  repiq --markdown github:golang/go
+
+Flags:
+`)
 		fs.PrintDefaults()
 	}
 
@@ -49,7 +50,7 @@ func Run(args []string, stdout, stderr io.Writer) error {
 	}
 
 	if *versionFlag {
-		fmt.Fprintf(stdout, "repiq %s\n", Version)
+		_, _ = fmt.Fprintf(stdout, "repiq %s\n", Version)
 		return nil
 	}
 

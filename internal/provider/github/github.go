@@ -181,7 +181,7 @@ func (p *Provider) countViaLinkHeader(ctx context.Context, owner, repo, resource
 	if err != nil {
 		return 0, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.LastPage > 0 {
 		return resp.LastPage, nil

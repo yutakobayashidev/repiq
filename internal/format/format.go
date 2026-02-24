@@ -32,7 +32,6 @@ func NDJSON(w io.Writer, results []provider.Result) error {
 
 // Markdown writes results as a Markdown table grouped by scheme.
 func Markdown(w io.Writer, results []provider.Result) error {
-	// Separate GitHub results and error-only results.
 	var ghResults []provider.Result
 	var errResults []provider.Result
 	for _, r := range results {
@@ -44,11 +43,15 @@ func Markdown(w io.Writer, results []provider.Result) error {
 	}
 
 	if len(ghResults) > 0 {
-		fmt.Fprintln(w, "| target | stars | forks | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d | error |")
-		fmt.Fprintln(w, "|---|---|---|---|---|---|---|---|---|---|")
+		if _, err := fmt.Fprintln(w, "| target | stars | forks | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d | error |"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|---|---|---|---|"); err != nil {
+			return err
+		}
 		for _, r := range ghResults {
 			g := r.GitHub
-			fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
+			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
 				r.Target,
 				strconv.Itoa(g.Stars),
 				strconv.Itoa(g.Forks),
@@ -59,18 +62,28 @@ func Markdown(w io.Writer, results []provider.Result) error {
 				strconv.Itoa(g.Commits30d),
 				strconv.Itoa(g.IssuesClosed30d),
 				r.Error,
-			)
+			); err != nil {
+				return err
+			}
 		}
 	}
 
 	if len(errResults) > 0 {
 		if len(ghResults) > 0 {
-			fmt.Fprintln(w)
+			if _, err := fmt.Fprintln(w); err != nil {
+				return err
+			}
 		}
-		fmt.Fprintln(w, "| target | error |")
-		fmt.Fprintln(w, "|---|---|")
+		if _, err := fmt.Fprintln(w, "| target | error |"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "|---|---|"); err != nil {
+			return err
+		}
 		for _, r := range errResults {
-			fmt.Fprintf(w, "| %s | %s |\n", r.Target, r.Error)
+			if _, err := fmt.Fprintf(w, "| %s | %s |\n", r.Target, r.Error); err != nil {
+				return err
+			}
 		}
 	}
 

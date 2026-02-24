@@ -3,43 +3,41 @@ package github
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
+func mustEncode(w http.ResponseWriter, v any) {
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		panic(err)
+	}
+}
+
 func setupMockServer(t *testing.T) *httptest.Server {
 	t.Helper()
 	mux := http.NewServeMux()
 
-	// GET /repos/owner/repo
-	mux.HandleFunc("GET /repos/owner/repo", func(w http.ResponseWriter, r *http.Request) {
-		resp := map[string]any{
-			"stargazers_count": 1000,
-			"forks_count":     200,
+	mux.HandleFunc("GET /repos/owner/repo", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{
+			"stargazers_count":  1000,
+			"forks_count":      200,
 			"open_issues_count": 50,
-		}
-		json.NewEncoder(w).Encode(resp)
+		})
 	})
 
-	// GET /repos/owner/repo/contributors (Link header for count estimation)
-	mux.HandleFunc("GET /repos/owner/repo/contributors", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /repos/owner/repo/contributors", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Link", `<https://api.github.com/repos/owner/repo/contributors?per_page=1&page=42>; rel="last"`)
-		resp := []map[string]any{{"login": "user1"}}
-		json.NewEncoder(w).Encode(resp)
+		mustEncode(w, []map[string]any{{"login": "user1"}})
 	})
 
-	// GET /repos/owner/repo/releases (Link header for count estimation)
-	mux.HandleFunc("GET /repos/owner/repo/releases", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /repos/owner/repo/releases", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Link", `<https://api.github.com/repos/owner/repo/releases?per_page=1&page=15>; rel="last"`)
-		resp := []map[string]any{{"tag_name": "v1.0"}}
-		json.NewEncoder(w).Encode(resp)
+		mustEncode(w, []map[string]any{{"tag_name": "v1.0"}})
 	})
 
-	// GET /repos/owner/repo/commits (latest commit)
-	mux.HandleFunc("GET /repos/owner/repo/commits", func(w http.ResponseWriter, r *http.Request) {
-		resp := []map[string]any{
+	mux.HandleFunc("GET /repos/owner/repo/commits", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, []map[string]any{
 			{
 				"sha": "abc123",
 				"commit": map[string]any{
@@ -48,26 +46,15 @@ func setupMockServer(t *testing.T) *httptest.Server {
 					},
 				},
 			},
-		}
-		json.NewEncoder(w).Encode(resp)
+		})
 	})
 
-	// GET /search/commits (commits_30d)
-	mux.HandleFunc("GET /search/commits", func(w http.ResponseWriter, r *http.Request) {
-		resp := map[string]any{
-			"total_count": 120,
-			"items":       []any{},
-		}
-		json.NewEncoder(w).Encode(resp)
+	mux.HandleFunc("GET /search/commits", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{"total_count": 120, "items": []any{}})
 	})
 
-	// GET /search/issues (issues_closed_30d)
-	mux.HandleFunc("GET /search/issues", func(w http.ResponseWriter, r *http.Request) {
-		resp := map[string]any{
-			"total_count": 340,
-			"items":       []any{},
-		}
-		json.NewEncoder(w).Encode(resp)
+	mux.HandleFunc("GET /search/issues", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{"total_count": 340, "items": []any{}})
 	})
 
 	return httptest.NewServer(mux)
@@ -120,9 +107,9 @@ func TestFetchSuccess(t *testing.T) {
 
 func TestFetchNotFound(t *testing.T) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /repos/bad/repo", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /repos/bad/repo", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]string{"message": "Not Found"})
+		mustEncode(w, map[string]string{"message": "Not Found"})
 	})
 	srv := httptest.NewServer(mux)
 	defer srv.Close()
@@ -160,33 +147,31 @@ func TestScheme(t *testing.T) {
 
 func TestFetchNoLinkHeader(t *testing.T) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /repos/owner/small", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]any{
+	mux.HandleFunc("GET /repos/owner/small", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{
 			"stargazers_count": 5,
 			"forks_count":     1,
 			"open_issues":     0,
 		})
 	})
-	mux.HandleFunc("GET /repos/owner/small/contributors", func(w http.ResponseWriter, r *http.Request) {
-		// No Link header — single page
-		json.NewEncoder(w).Encode([]map[string]any{{"login": "user1"}, {"login": "user2"}})
+	mux.HandleFunc("GET /repos/owner/small/contributors", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, []map[string]any{{"login": "user1"}, {"login": "user2"}})
 	})
-	mux.HandleFunc("GET /repos/owner/small/releases", func(w http.ResponseWriter, r *http.Request) {
-		// No Link header — single page
-		json.NewEncoder(w).Encode([]map[string]any{{"tag_name": "v0.1"}})
+	mux.HandleFunc("GET /repos/owner/small/releases", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, []map[string]any{{"tag_name": "v0.1"}})
 	})
-	mux.HandleFunc("GET /repos/owner/small/commits", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode([]map[string]any{
+	mux.HandleFunc("GET /repos/owner/small/commits", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, []map[string]any{
 			{"sha": "abc", "commit": map[string]any{
 				"committer": map[string]any{"date": "2026-02-25T00:00:00Z"},
 			}},
 		})
 	})
-	mux.HandleFunc("GET /search/commits", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]any{"total_count": 3, "items": []any{}})
+	mux.HandleFunc("GET /search/commits", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{"total_count": 3, "items": []any{}})
 	})
-	mux.HandleFunc("GET /search/issues", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]any{"total_count": 1, "items": []any{}})
+	mux.HandleFunc("GET /search/issues", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{"total_count": 1, "items": []any{}})
 	})
 	srv := httptest.NewServer(mux)
 	defer srv.Close()
@@ -199,6 +184,10 @@ func TestFetchNoLinkHeader(t *testing.T) {
 	if result.Error != "" {
 		t.Fatalf("unexpected result error: %s", result.Error)
 	}
-	fmt.Printf("contributors (no Link): %d\n", result.GitHub.Contributors)
-	fmt.Printf("releases (no Link): %d\n", result.GitHub.ReleaseCount)
+	if result.GitHub.Contributors != 2 {
+		t.Errorf("contributors: got %d, want 2", result.GitHub.Contributors)
+	}
+	if result.GitHub.ReleaseCount != 1 {
+		t.Errorf("releases: got %d, want 1", result.GitHub.ReleaseCount)
+	}
 }
