@@ -26,6 +26,40 @@ func TestResultSuccess(t *testing.T) {
 	}
 }
 
+func TestResultNPMSuccess(t *testing.T) {
+	r := provider.Result{
+		Target: "npm:react",
+		NPM: &provider.NPMMetrics{
+			WeeklyDownloads:   25000000,
+			LatestVersion:     "19.1.0",
+			LastPublishDays:   15,
+			DependenciesCount: 2,
+			License:           "MIT",
+		},
+	}
+	if r.Target != "npm:react" {
+		t.Errorf("got target %q, want %q", r.Target, "npm:react")
+	}
+	if r.Error != "" {
+		t.Errorf("got error %q, want empty", r.Error)
+	}
+	if r.GitHub != nil {
+		t.Error("expected GitHub to be nil for npm result")
+	}
+	if r.NPM == nil {
+		t.Fatal("expected NPM to be non-nil")
+	}
+	if r.NPM.WeeklyDownloads != 25000000 {
+		t.Errorf("got weekly_downloads %d, want 25000000", r.NPM.WeeklyDownloads)
+	}
+	if r.NPM.LatestVersion != "19.1.0" {
+		t.Errorf("got latest_version %q, want %q", r.NPM.LatestVersion, "19.1.0")
+	}
+	if r.NPM.License != "MIT" {
+		t.Errorf("got license %q, want %q", r.NPM.License, "MIT")
+	}
+}
+
 func TestResultError(t *testing.T) {
 	r := provider.Result{
 		Target: "github:nonexistent/repo",

@@ -13,6 +13,7 @@ import (
 	"github.com/yutakobayashidev/repiq/internal/format"
 	"github.com/yutakobayashidev/repiq/internal/provider"
 	ghprovider "github.com/yutakobayashidev/repiq/internal/provider/github"
+	npmprovider "github.com/yutakobayashidev/repiq/internal/provider/npm"
 )
 
 // Version is set at build time via ldflags.
@@ -37,7 +38,8 @@ Fetch objective metrics for OSS libraries and repositories.
 
 Examples:
   repiq github:facebook/react
-  repiq --ndjson github:facebook/react github:vuejs/core
+  repiq npm:react
+  repiq --ndjson github:facebook/react npm:react
   repiq --markdown github:golang/go
 
 Flags:
@@ -83,6 +85,7 @@ Flags:
 
 	registry := provider.NewRegistry()
 	registry.Register(ghprovider.New(token, ""))
+	registry.Register(npmprovider.New("", ""))
 
 	// Parse and validate all targets first.
 	parsed := make([]provider.Target, len(targets))

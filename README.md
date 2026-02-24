@@ -16,8 +16,17 @@ go install github.com/yutakobayashidev/repiq/cmd/repiq@latest
 # Single repo (JSON output by default)
 repiq github:facebook/react
 
-# Multiple repos in NDJSON
+# npm package
+repiq npm:react
+
+# Scoped npm package
+repiq npm:@types/node
+
+# Multiple targets in NDJSON
 repiq --ndjson github:facebook/react github:vuejs/core
+
+# Mixed providers in Markdown table
+repiq --markdown github:facebook/react npm:react
 
 # Markdown table
 repiq --markdown github:golang/go
@@ -28,6 +37,7 @@ repiq --markdown github:golang/go
 | Provider | Target format           |
 | -------- | ----------------------- |
 | GitHub   | `github:<owner>/<repo>` |
+| npm      | `npm:<package>`         |
 
 ## GitHub Metrics
 
@@ -42,13 +52,25 @@ repiq --markdown github:golang/go
 | `commits_30d`       | Commits in the last 30 days       |
 | `issues_closed_30d` | Issues closed in the last 30 days |
 
+## npm Metrics
+
+| Metric               | Description                        |
+| -------------------- | ---------------------------------- |
+| `weekly_downloads`   | Downloads in the last 7 days       |
+| `latest_version`     | Latest published version           |
+| `last_publish_days`  | Days since last publish            |
+| `dependencies_count` | Number of runtime dependencies     |
+| `license`            | License identifier (e.g. MIT, ISC) |
+
 ## Authentication
 
-Token resolution follows this priority:
+Token resolution follows this priority (GitHub provider only):
 
 1. `gh auth token` (GitHub CLI)
 2. `GITHUB_TOKEN` environment variable
 3. Unauthenticated (lower rate limits)
+
+npm provider requires no authentication.
 
 ## Output Formats
 
