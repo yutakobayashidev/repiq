@@ -25,6 +25,16 @@ func sampleResults() []provider.Result {
 			},
 		},
 		{
+			Target: "npm:react",
+			NPM: &provider.NPMMetrics{
+				WeeklyDownloads:   25000000,
+				LatestVersion:     "19.1.0",
+				LastPublishDays:   15,
+				DependenciesCount: 2,
+				License:           "MIT",
+			},
+		},
+		{
 			Target: "github:nonexistent/repo",
 			Error:  "GitHub API: 404 Not Found",
 		},
@@ -43,8 +53,8 @@ func TestJSON(t *testing.T) {
 	if err := json.Unmarshal(buf.Bytes(), &parsed); err != nil {
 		t.Fatalf("invalid JSON: %v\noutput: %s", err, buf.String())
 	}
-	if len(parsed) != 2 {
-		t.Errorf("expected 2 items, got %d", len(parsed))
+	if len(parsed) != 3 {
+		t.Errorf("expected 3 items, got %d", len(parsed))
 	}
 	// Should end with newline.
 	if !strings.HasSuffix(buf.String(), "\n") {
@@ -60,8 +70,8 @@ func TestNDJSON(t *testing.T) {
 	}
 
 	lines := strings.Split(strings.TrimSpace(buf.String()), "\n")
-	if len(lines) != 2 {
-		t.Errorf("expected 2 lines, got %d", len(lines))
+	if len(lines) != 3 {
+		t.Errorf("expected 3 lines, got %d", len(lines))
 	}
 	// Each line should be valid JSON.
 	for i, line := range lines {
@@ -95,6 +105,65 @@ func TestMarkdown(t *testing.T) {
 	// Error row should show error.
 	if !strings.Contains(output, "404 Not Found") {
 		t.Error("expected error message in output")
+	}
+}
+
+func TestMarkdownNPM(t *testing.T) {
+	var buf bytes.Buffer
+	results := []provider.Result{
+		{
+			Target: "npm:react",
+			NPM: &provider.NPMMetrics{
+				WeeklyDownloads:   25000000,
+				LatestVersion:     "19.1.0",
+				LastPublishDays:   15,
+				DependenciesCount: 2,
+				License:           "MIT",
+			},
+		},
+	}
+	if err := Markdown(&buf, results); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	output := buf.String()
+	if !strings.Contains(output, "| weekly_downloads |") {
+		t.Error("expected npm table header with '| weekly_downloads |'")
+	}
+	if !strings.Contains(output, "npm:react") {
+		t.Error("expected npm:react in output")
+	}
+	if !strings.Contains(output, "25000000") {
+		t.Error("expected weekly_downloads value in output")
+	}
+	if !strings.Contains(output, "19.1.0") {
+		t.Error("expected latest_version in output")
+	}
+	if !strings.Contains(output, "MIT") {
+		t.Error("expected license in output")
+	}
+}
+
+func TestMarkdownMixed(t *testing.T) {
+	var buf bytes.Buffer
+	results := sampleResults()
+	if err := Markdown(&buf, results); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	output := buf.String()
+	// Should have both GitHub and npm tables
+	if !strings.Contains(output, "| stars |") {
+		t.Error("expected GitHub table header")
+	}
+	if !strings.Contains(output, "| weekly_downloads |") {
+		t.Error("expected npm table header")
+	}
+	if !strings.Contains(output, "facebook/react") {
+		t.Error("expected GitHub result in output")
+	}
+	if !strings.Contains(output, "npm:react") {
+		t.Error("expected npm result in output")
 	}
 }
 
