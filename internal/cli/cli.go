@@ -60,16 +60,26 @@ Flags:
 		return fmt.Errorf("no targets specified")
 	}
 
-	// Determine output format (last specified wins, default is JSON).
+	// Determine output format (mutually exclusive).
+	formatCount := 0
+	if *jsonFlag {
+		formatCount++
+	}
+	if *ndjsonFlag {
+		formatCount++
+	}
+	if *markdownFlag {
+		formatCount++
+	}
+	if formatCount > 1 {
+		return fmt.Errorf("specify only one of --json, --ndjson, --markdown")
+	}
 	formatter := format.JSON
 	if *ndjsonFlag {
 		formatter = format.NDJSON
 	}
 	if *markdownFlag {
 		formatter = format.Markdown
-	}
-	if *jsonFlag {
-		formatter = format.JSON
 	}
 
 	// Set up providers.

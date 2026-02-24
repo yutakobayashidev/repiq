@@ -6,6 +6,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -13,6 +14,8 @@ import (
 	gogithub "github.com/google/go-github/v68/github"
 	"github.com/yutakobayashidev/repiq/internal/provider"
 )
+
+var validNameRe = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
 
 // Provider fetches metrics from the GitHub API.
 type Provider struct {
@@ -38,16 +41,11 @@ func New(token, baseURL string) *Provider {
 func (p *Provider) Scheme() string { return "github" }
 
 func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Result, error) {
-	parts := strings.SplitN(identifier, "/", 2)
-	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-		return provider.Result{
-			Target: "github:" + identifier,
-			Error:  fmt.Sprintf("invalid identifier %q: expected owner/repo", identifier),
-		}, nil
+	owner, repo, err := parseIdentifier(identifier)
+	if err != nil {
+		return provider.Result{Target: "github:" + identifier, Error: err.Error()}, nil
 	}
-	owner, repo := parts[0], parts[1]
 
-	// Fetch repo metadata first — if this fails, abort early.
 	repoInfo, resp, err := p.client.Repositories.Get(ctx, owner, repo)
 	if err != nil {
 		return provider.Result{
@@ -62,81 +60,86 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		OpenIssues: repoInfo.GetOpenIssuesCount(),
 	}
 
-	// Fetch remaining metrics in parallel.
+	errs := p.fetchParallel(ctx, owner, repo, metrics)
+
+	result := provider.Result{
+		Target: "github:" + identifier,
+		GitHub: metrics,
+	}
+	if len(errs) > 0 {
+		result.Error = strings.Join(errs, "; ")
+	}
+	return result, nil
+}
+
+func parseIdentifier(identifier string) (owner, repo string, err error) {
+	parts := strings.SplitN(identifier, "/", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return "", "", fmt.Errorf("invalid identifier %q: expected owner/repo", identifier)
+	}
+	if !validNameRe.MatchString(parts[0]) || !validNameRe.MatchString(parts[1]) {
+		return "", "", fmt.Errorf("invalid identifier %q: owner and repo must match [a-zA-Z0-9._-]+", identifier)
+	}
+	return parts[0], parts[1], nil
+}
+
+func (p *Provider) fetchParallel(ctx context.Context, owner, repo string, m *provider.GitHubMetrics) []string {
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	var errs []string
 
 	type job struct {
-		name string
-		fn   func(context.Context) error
+		fn func(context.Context) error
 	}
 
 	jobs := []job{
-		{"contributors", func(ctx context.Context) error {
-			count, err := p.countViaLinkHeader(ctx, owner, repo, "contributors")
+		{func(ctx context.Context) error {
+			count, err := p.fetchContributorCount(ctx, owner, repo)
 			if err != nil {
 				return fmt.Errorf("contributors: %w", err)
 			}
 			mu.Lock()
-			metrics.Contributors = count
+			m.Contributors = count
 			mu.Unlock()
 			return nil
 		}},
-		{"releases", func(ctx context.Context) error {
-			count, err := p.countViaLinkHeader(ctx, owner, repo, "releases")
+		{func(ctx context.Context) error {
+			count, err := p.fetchReleaseCount(ctx, owner, repo)
 			if err != nil {
 				return fmt.Errorf("releases: %w", err)
 			}
 			mu.Lock()
-			metrics.ReleaseCount = count
+			m.ReleaseCount = count
 			mu.Unlock()
 			return nil
 		}},
-		{"last_commit", func(ctx context.Context) error {
-			commits, _, err := p.client.Repositories.ListCommits(ctx, owner, repo, &gogithub.CommitsListOptions{
-				ListOptions: gogithub.ListOptions{PerPage: 1},
-			})
+		{func(ctx context.Context) error {
+			days, err := p.fetchLastCommitDays(ctx, owner, repo)
 			if err != nil {
 				return fmt.Errorf("commits: %w", err)
 			}
-			if len(commits) > 0 {
-				date := commits[0].GetCommit().GetCommitter().GetDate()
-				days := int(math.Floor(time.Since(date.Time).Hours() / 24))
-				if days < 0 {
-					days = 0
-				}
-				mu.Lock()
-				metrics.LastCommitDays = days
-				mu.Unlock()
-			}
+			mu.Lock()
+			m.LastCommitDays = days
+			mu.Unlock()
 			return nil
 		}},
-		{"commits_30d", func(ctx context.Context) error {
-			since := time.Now().AddDate(0, 0, -30).Format("2006-01-02")
-			query := fmt.Sprintf("repo:%s/%s committer-date:>%s", owner, repo, since)
-			result, _, err := p.client.Search.Commits(ctx, query, &gogithub.SearchOptions{
-				ListOptions: gogithub.ListOptions{PerPage: 1},
-			})
+		{func(ctx context.Context) error {
+			count, err := p.fetchCommits30d(ctx, owner, repo)
 			if err != nil {
 				return fmt.Errorf("search commits: %w", err)
 			}
 			mu.Lock()
-			metrics.Commits30d = result.GetTotal()
+			m.Commits30d = count
 			mu.Unlock()
 			return nil
 		}},
-		{"issues_closed_30d", func(ctx context.Context) error {
-			since := time.Now().AddDate(0, 0, -30).Format("2006-01-02")
-			query := fmt.Sprintf("repo:%s/%s is:issue is:closed closed:>%s", owner, repo, since)
-			result, _, err := p.client.Search.Issues(ctx, query, &gogithub.SearchOptions{
-				ListOptions: gogithub.ListOptions{PerPage: 1},
-			})
+		{func(ctx context.Context) error {
+			count, err := p.fetchIssuesClosed30d(ctx, owner, repo)
 			if err != nil {
 				return fmt.Errorf("search issues: %w", err)
 			}
 			mu.Lock()
-			metrics.IssuesClosed30d = result.GetTotal()
+			m.IssuesClosed30d = count
 			mu.Unlock()
 			return nil
 		}},
@@ -154,22 +157,66 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		}(j)
 	}
 	wg.Wait()
-
-	result := provider.Result{
-		Target: "github:" + identifier,
-		GitHub: metrics,
-	}
-	if len(errs) > 0 {
-		result.Error = strings.Join(errs, "; ")
-	}
-	return result, nil
+	return errs
 }
 
-// countViaLinkHeader estimates the total count by requesting per_page=1 and reading LastPage.
+func (p *Provider) fetchContributorCount(ctx context.Context, owner, repo string) (int, error) {
+	return p.countViaLinkHeader(ctx, owner, repo, "contributors")
+}
+
+func (p *Provider) fetchReleaseCount(ctx context.Context, owner, repo string) (int, error) {
+	return p.countViaLinkHeader(ctx, owner, repo, "releases")
+}
+
+func (p *Provider) fetchLastCommitDays(ctx context.Context, owner, repo string) (int, error) {
+	commits, _, err := p.client.Repositories.ListCommits(ctx, owner, repo, &gogithub.CommitsListOptions{
+		ListOptions: gogithub.ListOptions{PerPage: 1},
+	})
+	if err != nil {
+		return 0, err
+	}
+	if len(commits) == 0 {
+		return 0, nil
+	}
+	date := commits[0].GetCommit().GetCommitter().GetDate()
+	days := int(math.Floor(time.Since(date.Time).Hours() / 24))
+	if days < 0 {
+		days = 0
+	}
+	return days, nil
+}
+
+func (p *Provider) fetchCommits30d(ctx context.Context, owner, repo string) (int, error) {
+	since := time.Now().AddDate(0, 0, -30).Format("2006-01-02")
+	query := fmt.Sprintf("repo:%s/%s committer-date:>%s", owner, repo, since)
+	result, _, err := p.client.Search.Commits(ctx, query, &gogithub.SearchOptions{
+		ListOptions: gogithub.ListOptions{PerPage: 1},
+	})
+	if err != nil {
+		return 0, err
+	}
+	return result.GetTotal(), nil
+}
+
+func (p *Provider) fetchIssuesClosed30d(ctx context.Context, owner, repo string) (int, error) {
+	since := time.Now().AddDate(0, 0, -30).Format("2006-01-02")
+	query := fmt.Sprintf("repo:%s/%s is:issue is:closed closed:>%s", owner, repo, since)
+	result, _, err := p.client.Search.Issues(ctx, query, &gogithub.SearchOptions{
+		ListOptions: gogithub.ListOptions{PerPage: 1},
+	})
+	if err != nil {
+		return 0, err
+	}
+	return result.GetTotal(), nil
+}
+
+// countViaLinkHeader estimates count by requesting per_page=1 and reading LastPage from
+// the Link header. If no pagination exists (small repos), it re-fetches with per_page=100
+// and counts items directly. Note: the fallback is capped at 100 items; repos with
+// >100 contributors/releases without pagination headers will report up to 100.
 func (p *Provider) countViaLinkHeader(ctx context.Context, owner, repo, resource string) (int, error) {
-	// Build URL: /repos/{owner}/{repo}/{resource}?per_page=1
-	url := fmt.Sprintf("repos/%s/%s/%s", owner, repo, resource)
-	req, err := p.client.NewRequest("GET", url, nil)
+	u := fmt.Sprintf("repos/%s/%s/%s", owner, repo, resource)
+	req, err := p.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -186,8 +233,7 @@ func (p *Provider) countViaLinkHeader(ctx context.Context, owner, repo, resource
 	if resp.LastPage > 0 {
 		return resp.LastPage, nil
 	}
-	// No pagination — count items in first page.
-	// Re-fetch with default per_page to count.
+
 	switch resource {
 	case "contributors":
 		items, _, err := p.client.Repositories.ListContributors(ctx, owner, repo, &gogithub.ListContributorsOptions{

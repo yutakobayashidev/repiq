@@ -145,6 +145,17 @@ func TestScheme(t *testing.T) {
 	}
 }
 
+func TestFetchMaliciousIdentifier(t *testing.T) {
+	p := New("", "http://unused/")
+	result, err := p.Fetch(context.Background(), "owner/repo is:public")
+	if err != nil {
+		t.Fatalf("unexpected Go error: %v", err)
+	}
+	if result.Error == "" {
+		t.Fatal("expected result.Error for malicious identifier")
+	}
+}
+
 func TestFetchNoLinkHeader(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /repos/owner/small", func(w http.ResponseWriter, _ *http.Request) {
