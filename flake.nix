@@ -46,6 +46,13 @@
             src = ./.;
             hooks = {
               commitizen.enable = true;
+              gitleaks = {
+                enable = true;
+                name = "gitleaks";
+                entry = "${pkgs.gitleaks}/bin/gitleaks detect --source . --verbose --redact";
+                language = "system";
+                pass_filenames = false;
+              };
             };
           };
         }
