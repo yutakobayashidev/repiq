@@ -8,7 +8,7 @@
 - 取得するメトリクス:
   - `stars` — スター数
   - `forks` — フォーク数
-  - `open_issues` — オープン Issue 数
+  - `open_issues` — オープン Issue 数 (GitHub API 仕様により PR を含む)
   - `contributors` — コントリビューター数 (Link ヘッダー推定)
   - `release_count` — リリース数
   - `last_commit_days` — 最終コミットからの経過日数

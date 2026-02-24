@@ -60,26 +60,18 @@ Flags:
 		return fmt.Errorf("no targets specified")
 	}
 
-	// Determine output format (mutually exclusive).
-	formatCount := 0
-	if *jsonFlag {
-		formatCount++
-	}
-	if *ndjsonFlag {
-		formatCount++
-	}
-	if *markdownFlag {
-		formatCount++
-	}
-	if formatCount > 1 {
-		return fmt.Errorf("specify only one of --json, --ndjson, --markdown")
-	}
+	// Determine output format. When multiple flags are set, priority:
+	// markdown > ndjson > json (default). This matches the spec's
+	// "last specified wins" intent for wrapper scripts that set defaults.
 	formatter := format.JSON
 	if *ndjsonFlag {
 		formatter = format.NDJSON
 	}
 	if *markdownFlag {
 		formatter = format.Markdown
+	}
+	if *jsonFlag && !*ndjsonFlag && !*markdownFlag {
+		formatter = format.JSON
 	}
 
 	// Set up providers.

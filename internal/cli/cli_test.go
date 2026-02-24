@@ -63,13 +63,16 @@ func TestRunMultipleTargets(t *testing.T) {
 	}
 }
 
-func TestRunExclusiveFormatFlags(t *testing.T) {
+func TestRunMultipleFormatFlagsNoError(t *testing.T) {
+	// Per spec Edge Case 9: multiple format flags use priority (markdown > ndjson > json).
+	// This should NOT return an error for the flags themselves.
+	// It will fail on fetch (no real API), but the flag parsing must succeed.
 	var stdout, stderr bytes.Buffer
-	err := Run([]string{"--json", "--ndjson", "github:golang/go"}, &stdout, &stderr)
+	err := Run([]string{"--json", "--ndjson", "unknown:x"}, &stdout, &stderr)
 	if err == nil {
-		t.Fatal("expected error for multiple format flags")
+		t.Fatal("expected error (unknown scheme), but not a flag error")
 	}
-	if !strings.Contains(err.Error(), "specify only one") {
-		t.Errorf("expected exclusive flag error, got: %v", err)
+	if strings.Contains(err.Error(), "specify only one") {
+		t.Errorf("format flags should not be exclusive, got: %v", err)
 	}
 }

@@ -35,7 +35,7 @@ repiq --markdown github:golang/go
 | ------------------- | --------------------------------- |
 | `stars`             | Star count                        |
 | `forks`             | Fork count                        |
-| `open_issues`       | Open issue count                  |
+| `open_issues`       | Open issue count (includes PRs)   |
 | `contributors`      | Number of contributors            |
 | `release_count`     | Total releases                    |
 | `last_commit_days`  | Days since last commit            |
