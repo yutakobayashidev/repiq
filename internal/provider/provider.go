@@ -12,7 +12,17 @@ type Provider interface {
 type Result struct {
 	Target string         `json:"target"`
 	GitHub *GitHubMetrics `json:"github,omitempty"`
+	NPM    *NPMMetrics    `json:"npm,omitempty"`
 	Error  string         `json:"error,omitempty"`
+}
+
+// NPMMetrics holds npm registry metrics.
+type NPMMetrics struct {
+	WeeklyDownloads   int    `json:"weekly_downloads"`
+	LatestVersion     string `json:"latest_version"`
+	LastPublishDays   int    `json:"last_publish_days"`
+	DependenciesCount int    `json:"dependencies_count"`
+	License           string `json:"license"`
 }
 
 // GitHubMetrics holds GitHub-specific metrics.
