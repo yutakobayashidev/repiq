@@ -172,8 +172,9 @@ func TestFetchScopedPackage(t *testing.T) {
 	defer reg.Close()
 
 	dlMux := http.NewServeMux()
-	// scoped package: @types%2Fnode
-	dlMux.HandleFunc("GET /downloads/point/last-week/@types/node", func(w http.ResponseWriter, _ *http.Request) {
+	// scoped package: url.PathEscape encodes "/" as %2F, which Go's ServeMux
+	// doesn't decode for pattern matching. Use a wildcard to match.
+	dlMux.HandleFunc("GET /downloads/point/last-week/{pkg...}", func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{"downloads": 5000000})
 	})
 	dl := httptest.NewServer(dlMux)

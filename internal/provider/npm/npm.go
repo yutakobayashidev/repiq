@@ -221,16 +221,11 @@ func (p *Provider) fetchLastPublishDays(ctx context.Context, pkg string) (int, e
 }
 
 func (p *Provider) fetchWeeklyDownloads(ctx context.Context, pkg string) (int, error) {
-	// For scoped packages (@scope/name), the npm downloads API accepts
-	// the package name with the slash URL-encoded as %2F.
-	// We build the URL manually to preserve this encoding.
-	encodedPkg := pkg
-	if strings.HasPrefix(pkg, "@") {
-		parts := strings.SplitN(pkg, "/", 2)
-		if len(parts) == 2 {
-			encodedPkg = url.PathEscape(parts[0]) + "/" + url.PathEscape(parts[1])
-		}
-	}
+	// For scoped packages (@scope/name), the npm downloads API requires
+	// the package name as a single path token with the slash encoded as %2F
+	// (e.g., @scope%2Fname). We use url.PathEscape on the full name to
+	// achieve this, since PathEscape encodes "/" to %2F.
+	encodedPkg := url.PathEscape(pkg)
 
 	u := fmt.Sprintf("%s/downloads/point/last-week/%s", p.downloadsURL, encodedPkg)
 	req, err := http.NewRequestWithContext(ctx, "GET", u, nil)
