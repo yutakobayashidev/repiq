@@ -43,10 +43,20 @@ test(provider): add unit tests for target parsing
 refactor(cli): extract output formatter into separate package
 ```
 
+### PR Titles
+
+PR titles **must** follow the same convention. Squash merges use the PR title as the commit message.
+
+```
+docs(specs): add CLI + GitHub provider feature spec
+feat(github): implement GitHub provider with metrics fetching
+```
+
 ### Bad Examples
 
 ```
 feat: add markdown output        # missing scope
 update code                      # missing type and scope
 fix(github): Fix bug.            # don't capitalize, don't end with period
+Core: CLI + GitHub プロバイダー  # PR title not following convention
 ```
