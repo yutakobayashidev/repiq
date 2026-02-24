@@ -7,12 +7,15 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/yutakobayashidev/repiq/internal/provider"
 )
+
+var validPkgRe = regexp.MustCompile(`^(@[a-zA-Z0-9][\w.-]*/)?[a-zA-Z0-9][\w.-]*$`)
 
 const (
 	defaultRegistryURL  = "https://registry.npmjs.org"
@@ -37,17 +40,17 @@ func New(registryURL, downloadsURL string) *Provider {
 	return &Provider{
 		registryURL:  strings.TrimRight(registryURL, "/"),
 		downloadsURL: strings.TrimRight(downloadsURL, "/"),
-		client:       &http.Client{},
+		client:       &http.Client{Timeout: 30 * time.Second},
 	}
 }
 
 func (p *Provider) Scheme() string { return "npm" }
 
 func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Result, error) {
-	if identifier == "" {
+	if identifier == "" || !validPkgRe.MatchString(identifier) {
 		return provider.Result{
-			Target: "npm:",
-			Error:  "invalid identifier: package name must not be empty",
+			Target: "npm:" + identifier,
+			Error:  fmt.Sprintf("invalid npm package name %q", identifier),
 		}, nil
 	}
 

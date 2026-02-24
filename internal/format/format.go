@@ -5,9 +5,14 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 
 	"github.com/yutakobayashidev/repiq/internal/provider"
 )
+
+func escapeMarkdown(s string) string {
+	return strings.ReplaceAll(s, "|", "\\|")
+}
 
 // JSON writes results as a JSON array.
 func JSON(w io.Writer, results []provider.Result) error {
@@ -58,7 +63,7 @@ func Markdown(w io.Writer, results []provider.Result) error {
 		for _, r := range ghResults {
 			g := r.GitHub
 			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
-				r.Target,
+				escapeMarkdown(r.Target),
 				strconv.Itoa(g.Stars),
 				strconv.Itoa(g.Forks),
 				strconv.Itoa(g.OpenIssues),
@@ -67,7 +72,7 @@ func Markdown(w io.Writer, results []provider.Result) error {
 				strconv.Itoa(g.LastCommitDays),
 				strconv.Itoa(g.Commits30d),
 				strconv.Itoa(g.IssuesClosed30d),
-				r.Error,
+				escapeMarkdown(r.Error),
 			); err != nil {
 				return err
 			}
@@ -90,13 +95,13 @@ func Markdown(w io.Writer, results []provider.Result) error {
 		for _, r := range npmResults {
 			n := r.NPM
 			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s |\n",
-				r.Target,
+				escapeMarkdown(r.Target),
 				strconv.Itoa(n.WeeklyDownloads),
-				n.LatestVersion,
+				escapeMarkdown(n.LatestVersion),
 				strconv.Itoa(n.LastPublishDays),
 				strconv.Itoa(n.DependenciesCount),
-				n.License,
-				r.Error,
+				escapeMarkdown(n.License),
+				escapeMarkdown(r.Error),
 			); err != nil {
 				return err
 			}
@@ -117,7 +122,7 @@ func Markdown(w io.Writer, results []provider.Result) error {
 			return err
 		}
 		for _, r := range errResults {
-			if _, err := fmt.Fprintf(w, "| %s | %s |\n", r.Target, r.Error); err != nil {
+			if _, err := fmt.Fprintf(w, "| %s | %s |\n", escapeMarkdown(r.Target), escapeMarkdown(r.Error)); err != nil {
 				return err
 			}
 		}

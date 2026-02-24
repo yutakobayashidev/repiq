@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func mustEncode(w http.ResponseWriter, v any) {
@@ -34,13 +35,14 @@ func setupMockServers(t *testing.T) (registry *httptest.Server, downloads *httpt
 	})
 
 	// GET /react (abbreviated metadata)
+	modified15d := time.Now().Add(-15 * 24 * time.Hour).Format("2006-01-02T15:04:05.000Z")
 	regMux.HandleFunc("GET /react", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Accept") != "application/vnd.npm.install-v1+json" {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		mustEncode(w, map[string]any{
-			"modified": "2026-02-10T12:00:00.000Z",
+			"modified": modified15d,
 		})
 	})
 
@@ -100,8 +102,8 @@ func TestFetchSuccess(t *testing.T) {
 	if n.License != "MIT" {
 		t.Errorf("license: got %q, want %q", n.License, "MIT")
 	}
-	if n.LastPublishDays < 0 {
-		t.Errorf("last_publish_days: got %d, want >= 0", n.LastPublishDays)
+	if n.LastPublishDays < 14 || n.LastPublishDays > 16 {
+		t.Errorf("last_publish_days: got %d, want ~15", n.LastPublishDays)
 	}
 }
 
@@ -163,7 +165,7 @@ func TestFetchScopedPackage(t *testing.T) {
 			return
 		}
 		mustEncode(w, map[string]any{
-			"modified": "2026-02-20T10:00:00.000Z",
+			"modified": time.Now().Add(-5 * 24 * time.Hour).Format("2006-01-02T15:04:05.000Z"),
 		})
 	})
 	reg := httptest.NewServer(regMux)
@@ -207,7 +209,7 @@ func TestFetchLicenseObject(t *testing.T) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		mustEncode(w, map[string]any{"modified": "2026-01-01T00:00:00.000Z"})
+		mustEncode(w, map[string]any{"modified": time.Now().Add(-55 * 24 * time.Hour).Format("2006-01-02T15:04:05.000Z")})
 	})
 	reg := httptest.NewServer(regMux)
 	defer reg.Close()
@@ -243,7 +245,7 @@ func TestFetchNoDependencies(t *testing.T) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		mustEncode(w, map[string]any{"modified": "2026-02-01T00:00:00.000Z"})
+		mustEncode(w, map[string]any{"modified": time.Now().Add(-24 * 24 * time.Hour).Format("2006-01-02T15:04:05.000Z")})
 	})
 	reg := httptest.NewServer(regMux)
 	defer reg.Close()
@@ -279,7 +281,7 @@ func TestFetchPartialFailure(t *testing.T) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		mustEncode(w, map[string]any{"modified": "2026-02-15T00:00:00.000Z"})
+		mustEncode(w, map[string]any{"modified": time.Now().Add(-10 * 24 * time.Hour).Format("2006-01-02T15:04:05.000Z")})
 	})
 	reg := httptest.NewServer(regMux)
 	defer reg.Close()
