@@ -143,7 +143,7 @@ func (p *Provider) fetchLatest(ctx context.Context, pkg string) (*latestResponse
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("npm registry: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
@@ -189,7 +189,7 @@ func (p *Provider) fetchLastPublishDays(ctx context.Context, pkg string) (int, e
 	if err != nil {
 		return 0, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return 0, fmt.Errorf("npm registry: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
@@ -239,7 +239,7 @@ func (p *Provider) fetchWeeklyDownloads(ctx context.Context, pkg string) (int, e
 	if err != nil {
 		return 0, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return 0, fmt.Errorf("npm downloads API: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))

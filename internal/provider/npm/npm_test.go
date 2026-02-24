@@ -200,7 +200,7 @@ func TestFetchLicenseObject(t *testing.T) {
 	regMux := http.NewServeMux()
 	regMux.HandleFunc("GET /old-pkg/latest", func(w http.ResponseWriter, _ *http.Request) {
 		// license as object (legacy format)
-		w.Write([]byte(`{"name":"old-pkg","version":"1.0.0","license":{"type":"ISC","url":"https://example.com"},"dependencies":{}}`))
+		_, _ = w.Write([]byte(`{"name":"old-pkg","version":"1.0.0","license":{"type":"ISC","url":"https://example.com"},"dependencies":{}}`))
 	})
 	regMux.HandleFunc("GET /old-pkg", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Accept") != "application/vnd.npm.install-v1+json" {
@@ -236,7 +236,7 @@ func TestFetchNoDependencies(t *testing.T) {
 	regMux := http.NewServeMux()
 	regMux.HandleFunc("GET /no-deps/latest", func(w http.ResponseWriter, _ *http.Request) {
 		// no dependencies field at all
-		w.Write([]byte(`{"name":"no-deps","version":"1.0.0","license":"MIT"}`))
+		_, _ = w.Write([]byte(`{"name":"no-deps","version":"1.0.0","license":"MIT"}`))
 	})
 	regMux.HandleFunc("GET /no-deps", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Accept") != "application/vnd.npm.install-v1+json" {
