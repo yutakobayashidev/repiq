@@ -20,9 +20,19 @@ MVP (Minimum Viable Product)
 - local:// パス解析
 - ローカルキャッシュ
 - fast モード (500ms)
-- MCP サーバーモード
+- Agents Skills
 - プラグインシステム
 - ランキング・推薦・スコアリング (永久に非対象)
+
+## Recommended Epics
+
+| Priority | Epic (slug) | One-line description | Why |
+| -------- | ----------- | -------------------- | --- |
+| P0 | `core` | CLI スケルトン + プロバイダーインターフェース + GitHub プロバイダー | 動く最小構成。これがないと何も始まらない |
+| P1 | `npm` | npm レジストリプロバイダー | MVP スコープの後半。GitHub だけでは不十分 |
+| P2 | `cache` | ローカルキャッシュレイヤー | 繰り返し実行の高速化。UX 改善に直結 |
+| P3 | `registries` | crate / pypi / go modules プロバイダー追加 | レジストリ拡充。ビジョンの中核 |
+| P4 | `scorecard` | OpenSSF Scorecard 統合 | セキュリティ指標の追加。エージェントの判断材料を拡充 |
 
 ## Technical Constraints
 
@@ -41,14 +51,3 @@ MVP (Minimum Viable Product)
 - `--markdown` で人間が読める Markdown テーブルで出力できる
 - CI で `golangci-lint` が通る
 - 基本的なユニットテストがある
-
-## Recommended Epics
-
-| Priority | Epic (slug) | One-line description | Why |
-| -------- | ----------- | -------------------- | --- |
-| P0 | `core` | CLI スケルトン + プロバイダーインターフェース + GitHub プロバイダー | 動く最小構成。これがないと何も始まらない |
-| P1 | `npm` | npm レジストリプロバイダー | MVP スコープの後半。GitHub だけでは不十分 |
-| P2 | `cache` | ローカルキャッシュレイヤー | 繰り返し実行の高速化。UX 改善に直結 |
-| P3 | `registries` | crate / pypi / go modules プロバイダー追加 | レジストリ拡充。ビジョンの中核 |
-| P4 | `scorecard` | OpenSSF Scorecard 統合 | セキュリティ指標の追加。エージェントの判断材料を拡充 |
-| P5 | `mcp` | MCP サーバーモード | AI エージェントからの直接呼び出し対応 |

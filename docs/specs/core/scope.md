@@ -20,7 +20,7 @@
 - npm / crate / pypi / local プロバイダー (別 Epic)
 - OpenSSF Scorecard 統合
 - ローカルキャッシュ
-- MCP サーバーモード
+- Agents Skills
 - CI/CD パイプライン構築
 - サブコマンド (現時点では不要)
 - 設定ファイル
