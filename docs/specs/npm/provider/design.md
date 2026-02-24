@@ -77,7 +77,7 @@ Fetch(ctx, identifier)
 - 全リクエスト失敗: `Result.Error` にエラーメッセージを設定、`NPM` は nil
 - 部分失敗: 取得できたメトリクスは設定、エラーメッセージも error に記録
 - 404: 「package not found: {identifier}」
-- タイムアウト: context.Context で 30 秒タイムアウト (CLI グローバル設定を継承)
+- タイムアウト: 各 goroutine は context.Context の 30 秒タイムアウト (CLI グローバル設定) を個別に参照。タイムアウトした goroutine のメトリクスのみゼロ値とし、成功した goroutine のメトリクスは返却する
 
 ### 出力スキーマ
 
