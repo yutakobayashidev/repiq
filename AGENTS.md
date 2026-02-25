@@ -28,6 +28,9 @@ Scope is **mandatory**. Use the most relevant area:
 - `provider` - Provider interface, shared provider logic
 - `github` - GitHub provider
 - `npm` - npm provider
+- `pypi` - PyPI provider
+- `crates` - crates.io provider
+- `go` - Go Modules provider
 - `specs` - Spec documents under docs/specs/
 - `nix` - Nix flake, dev environment
 - `deps` - Dependency updates
