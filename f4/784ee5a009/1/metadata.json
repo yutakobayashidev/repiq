@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "f4784ee5a009",
+  "session_id": "9ac35f70-30b6-4e7f-bc18-4f32985371ef",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-25T06:28:38.394536361Z",
+  "branch": "main",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "README.md"
+  ],
+  "agent": "Claude Code",
+  "turn_id": "ceb751665b07",
+  "token_usage": {
+    "input_tokens": 140,
+    "cache_creation_tokens": 15560,
+    "cache_read_tokens": 199183,
+    "output_tokens": 84,
+    "api_call_count": 9
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-25T06:28:38.368456665Z",
+    "agent_lines": 2,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 2,
+    "agent_percentage": 100
+  },
+  "transcript_path": ".config/claude/projects/-home-yuta-ghq-github-com-yutakobayashidev-repiq/9ac35f70-30b6-4e7f-bc18-4f32985371ef.jsonl"
+}
