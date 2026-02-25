@@ -22,11 +22,20 @@ repiq npm:react
 # Scoped npm package
 repiq npm:@types/node
 
+# Python package (PyPI)
+repiq pypi:requests
+
+# Rust crate (crates.io)
+repiq crates:serde
+
+# Go module
+repiq go:golang.org/x/text
+
 # Multiple targets in NDJSON
 repiq --ndjson github:facebook/react github:vuejs/core
 
 # Mixed providers in Markdown table
-repiq --markdown github:facebook/react npm:react
+repiq --markdown github:facebook/react npm:react pypi:flask crates:tokio go:golang.org/x/net
 
 # Markdown table
 repiq --markdown github:golang/go
@@ -34,10 +43,13 @@ repiq --markdown github:golang/go
 
 ## Supported Providers
 
-| Provider | Target format           |
-| -------- | ----------------------- |
-| GitHub   | `github:<owner>/<repo>` |
-| npm      | `npm:<package>`         |
+| Provider   | Target format              |
+| ---------- | -------------------------- |
+| GitHub     | `github:<owner>/<repo>`    |
+| npm        | `npm:<package>`            |
+| PyPI       | `pypi:<package>`           |
+| crates.io  | `crates:<crate>`           |
+| Go Modules | `go:<module>`              |
 
 ## GitHub Metrics
 
@@ -62,6 +74,41 @@ repiq --markdown github:golang/go
 | `dependencies_count` | Number of runtime dependencies     |
 | `license`            | License identifier (e.g. MIT, ISC) |
 
+## PyPI Metrics
+
+| Metric               | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `weekly_downloads`   | Downloads in the last 7 days                |
+| `monthly_downloads`  | Downloads in the last 30 days               |
+| `latest_version`     | Latest published version                    |
+| `last_publish_days`  | Days since last publish                     |
+| `dependencies_count` | Number of runtime dependencies              |
+| `license`            | License identifier                          |
+| `requires_python`    | Python version requirement (e.g. `>=3.9`)   |
+
+## crates.io Metrics
+
+| Metric                  | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `downloads`             | Total all-time downloads                 |
+| `recent_downloads`      | Downloads in the last 90 days            |
+| `latest_version`        | Latest stable version                    |
+| `last_publish_days`     | Days since last publish                  |
+| `dependencies_count`    | Number of normal dependencies            |
+| `license`               | SPDX license identifier                  |
+| `reverse_dependencies`  | Number of crates that depend on this one |
+
+## Go Modules Metrics
+
+| Metric               | Description                            |
+| -------------------- | -------------------------------------- |
+| `latest_version`     | Latest version tag                     |
+| `last_publish_days`  | Days since last publish                |
+| `dependencies_count` | Number of direct dependencies          |
+| `license`            | License identifier (via deps.dev)      |
+
+> Go does not provide public download count APIs. Use GitHub metrics for popularity signals.
+
 ## Authentication
 
 Token resolution follows this priority (GitHub provider only):
@@ -70,7 +117,7 @@ Token resolution follows this priority (GitHub provider only):
 2. `GITHUB_TOKEN` environment variable
 3. Unauthenticated (lower rate limits)
 
-npm provider requires no authentication.
+Other providers (npm, PyPI, crates.io, Go Modules) require no authentication.
 
 ## Output Formats
 
