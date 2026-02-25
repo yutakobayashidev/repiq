@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "75bad684190c",
+  "session_id": "e82ef922-87a8-40fe-880c-33fbc06cf3b0",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-25T03:38:38.031698268Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "internal/provider/pypi/pypi.go",
+    "internal/provider/pypi/pypi_test.go",
+    "docs/scenario-test.md"
+  ],
+  "agent": "Claude Code",
+  "turn_id": "e5833999edd3",
+  "token_usage": {
+    "input_tokens": 2164,
+    "cache_creation_tokens": 640924,
+    "cache_read_tokens": 20501932,
+    "output_tokens": 30933,
+    "api_call_count": 217
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-25T03:38:37.437205239Z",
+    "agent_lines": 0,
+    "human_added": 228,
+    "human_modified": 4,
+    "human_removed": 0,
+    "total_committed": 228,
+    "agent_percentage": 0
+  },
+  "transcript_path": ".config/claude/projects/-home-yuta-ghq-github-com-yutakobayashidev-repiq/e82ef922-87a8-40fe-880c-33fbc06cf3b0.jsonl"
+}
