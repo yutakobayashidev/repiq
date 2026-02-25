@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "01c5812055dc",
+  "session_id": "fe8e0343-251d-46cf-9018-0be57e62f200",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-25T03:52:48.447259155Z",
+  "branch": "main",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "internal/provider/provider.go",
+    "README.md",
+    "internal/format/format.go",
+    "internal/format/format_test.go",
+    "internal/provider/github/github.go",
+    "internal/provider/github/github_test.go",
+    "internal/provider/npm/npm.go",
+    "internal/provider/npm/npm_test.go"
+  ],
+  "agent": "Claude Code",
+  "turn_id": "9be733db1d6e",
+  "transcript_identifier_at_start": "da88103c-5374-4ae1-bea3-90c695f35f08",
+  "checkpoint_transcript_start": 216,
+  "transcript_lines_at_start": 216,
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 17372,
+    "cache_read_tokens": 535164,
+    "output_tokens": 5585,
+    "api_call_count": 8
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-25T03:52:48.156285113Z",
+    "agent_lines": 0,
+    "human_added": 73,
+    "human_modified": 18,
+    "human_removed": 0,
+    "total_committed": 73,
+    "agent_percentage": 0
+  },
+  "transcript_path": ".config/claude/projects/-home-yuta-ghq-github-com-yutakobayashidev-repiq/fe8e0343-251d-46cf-9018-0be57e62f200.jsonl"
+}
