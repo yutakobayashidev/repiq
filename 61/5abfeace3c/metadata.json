@@ -1,0 +1,20 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "615abfeace3c",
+  "strategy": "manual-commit",
+  "branch": "docs/cache-disk",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "docs/specs/cache/disk-cache/design.md",
+    "docs/specs/cache/disk-cache/requirements.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/61/5abfeace3c/0/metadata.json",
+      "transcript": "/61/5abfeace3c/0/full.jsonl",
+      "context": "",
+      "content_hash": "/61/5abfeace3c/0/content_hash.txt",
+      "prompt": ""
+    }
+  ]
+}

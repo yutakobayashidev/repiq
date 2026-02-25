@@ -1,0 +1,25 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "615abfeace3c",
+  "session_id": "62367aca-7b96-4e51-9d5d-cb2b17f4c108",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-25T00:05:17.918977766Z",
+  "branch": "docs/cache-disk",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "docs/specs/cache/disk-cache/design.md",
+    "docs/specs/cache/disk-cache/requirements.md"
+  ],
+  "agent": "Claude Code",
+  "turn_id": "37a84fb40308",
+  "initial_attribution": {
+    "calculated_at": "2026-02-25T00:05:17.918582327Z",
+    "agent_lines": 0,
+    "human_added": 215,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 215,
+    "agent_percentage": 0
+  },
+  "transcript_path": ".config/claude/projects/-home-yuta-ghq-github-com-yutakobayashidev-repiq--git-wt-docs-cache/62367aca-7b96-4e51-9d5d-cb2b17f4c108.jsonl"
+}
