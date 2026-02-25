@@ -1,0 +1,879 @@
+# Menu Command
+
+Create a lightweight epic-level spec for the initiative described in ``.
+
+This is the PM's first step: define WHAT to build and WHY.
+
+## Workflow
+
+### Step 1: Investigate Codebase
+
+Use Grep, Glob, Read to understand:
+
+- Existing features related to this initiative
+- Current architecture and patterns
+- Potential impact areas
+
+### Step 2: Clarify Requirements
+
+Use AskUserQuestion iteratively:
+
+- 2-4 questions per round
+- 2-4 concrete options per question
+- Focus categories:
+  - **Why**: Business reason for this initiative
+  - **Hypothesis**: What we expect to validate
+  - **Scope**: What to include / exclude
+  - **Users**: Target users, personas
+  - **Success criteria**: How we measure success
+  - **Risks**: What could go wrong
+
+Keep iterating until Why, hypothesis, and scope are clear.
+
+### Step 3: Create Worktree & Spec Directory
+
+Create a docs-only worktree for this epic:
+
+```
+EnterWorktree({ name: "docs/<epic>" })
+```
+
+Then inside the worktree, create `docs/specs/<epic>/` with 2 files:
+
+```
+docs/specs/<epic>/
+├── overview.md
+└── scope.md
+```
+
+`<epic>` is a slug derived from user input (e.g., "PDF export feature" -> `pdf-export`).
+
+#### overview.md
+
+```markdown
+# <Epic Name>
+
+## Summary
+
+<!-- 1-2 sentence project overview -->
+
+## Background & Purpose
+
+<!-- Why is this project needed? User pain points, business rationale -->
+
+## Why Now
+
+<!-- Urgency, timing rationale -->
+
+## Hypothesis
+
+<!-- What we want to validate. Use "If we <action>, then <outcome>" format -->
+
+- Hypothesis 1:
+- Hypothesis 2:
+
+## Expected Outcome
+
+<!-- What we gain if hypotheses are correct -->
+```
+
+#### scope.md
+
+```markdown
+# Scope: <Epic Name>
+
+## In Scope
+
+-
+
+## Out of Scope
+
+-
+
+## Success Criteria (KPI)
+
+### Expected to Improve
+
+-
+
+### At Risk (may decrease)
+
+-
+
+## Acceptance Gates
+
+<!-- Conditions for PM to approve release -->
+
+- [ ]
+
+## Experiment Info (if applicable)
+
+- Flag name:
+- Variants:
+- Traffic split %:
+```
+
+### Step 4: User Confirmation
+
+Present generated files for review. Handle modifications if requested.
+
+### Step 5: Create Docs-Only PR
+
+Commit and push the spec documents:
+
+```bash
+git add docs/specs/<epic>/overview.md docs/specs/<epic>/scope.md
+git commit -m "docs: <epic> スペック追加"
+git push -u origin HEAD
+```
+
+Create a PR for team/AI review:
+
+```bash
+gh pr create \
+  --title "docs: <epic title> スペック" \
+  --label "epic,docs" \
+  --body "$(cat <<'EOF'
+## 概要
+
+<!-- 1-2 sentence summary from overview.md -->
+
+## 背景・目的
+
+<!-- Short summary of Why + hypothesis from overview.md -->
+
+## スペック
+
+- `docs/specs/<epic>/overview.md`
+- `docs/specs/<epic>/scope.md`
+
+## レビュー観点
+
+- [ ] 課題設定は妥当か
+- [ ] スコープは適切か
+- [ ] 完了条件は明確で検証可能か
+- [ ] 見落としているリスクはないか
+EOF
+)"
+```
+
+Open in browser:
+
+```bash
+gh pr view --web
+```
+
+## Rules
+
+- Always respond in the user's language
+- Read existing code BEFORE asking questions
+- Limit each AskUserQuestion to 2-4 questions
+- Provide 2-4 concrete options per question
+- Do NOT create requirements.md or design.md — that is the engineer's job (done by the recipe agent)
+- Always request user confirmation after generating files
+
+## Next Step
+
+After the PR is approved and merged, run `/kitchen:order` to create an Epic Issue.
+
+---
+
+マージしました
+
+---
+
+# Order Command
+
+Takes a spec directory (e.g., `docs/specs/pdf-export`) or epic name via `` and creates an **Epic Issue** on GitHub.
+
+This is the PM's second step: pass the order to the engineering team.
+
+## Workflow
+
+### Step 1: Read the Spec
+
+1. Read `overview.md` and `scope.md` under `docs/specs/<epic>/`
+2. If spec not found, suggest running `/kitchen:menu` first
+
+### Step 2: Create Epic Issue
+
+Compose the issue body:
+
+- **Summarize** the spec (do not duplicate full content)
+- **Link** to the spec files as the source of truth
+
+Follow `registry/git/templates/issue/epic.md` template:
+
+```markdown
+## 概要
+
+<!-- 1-2 sentence summary from overview.md -->
+
+## 背景・目的
+
+<!-- Short summary of Why + hypothesis from overview.md -->
+
+## スペック
+
+> [overview.md](docs/specs/<epic>/overview.md) | [scope.md](docs/specs/<epic>/scope.md)
+
+## 完了条件
+
+- [ ] <!-- Key acceptance gates from scope.md -->
+
+## 参考情報・補足
+
+- Spec directory: `docs/specs/<epic>/`
+- Success criteria: <!-- 1-line summary from scope.md KPI -->
+- Out of scope: <!-- 1-line summary from scope.md -->
+```
+
+Publish:
+
+```bash
+gh issue create \
+  --title "<epic title>" \
+  --label "epic" \
+  --body-file -
+```
+
+Open in browser:
+
+```bash
+gh issue view --web
+```
+
+### Step 3: User Confirmation
+
+Present the created issue. Handle modifications if needed.
+
+## Rules
+
+- Always respond in the user's language
+
+## Title Rules
+
+- Written in Japanese (following git plugin convention)
+- 72 characters or fewer
+- No prefixes like `[WIP]`, `[BUG]`, `[FEATURE]`
+- Convey the overall initiative clearly
+
+## What This Command Does NOT Do
+
+- Does not create child task issues (engineer does this via chef -> prep)
+- Does not decompose requirements into technical tasks
+- Does not prescribe implementation approach
+
+## Next Step
+
+After order, the engineer runs `/kitchen:recipe #<issue-number>` to start implementation.
+
+---
+
+# Recipe Command
+
+You are a requirements specialist who reads the issue/spec, investigates the codebase, clarifies ambiguities, and writes detailed feature-level specifications.
+
+## Your Skills
+
+Read and follow these skill documents when working:
+
+- `registry/skills/coding-standards.md` — Read to understand project coding conventions. Ground requirements in these standards.
+- `registry/skills/backend-patterns.md` — Read when specifying backend features (API, DB, server-side).
+- `registry/skills/frontend-patterns.md` — Read when specifying frontend features (React, Next.js, state).
+- `registry/skills/design-principles/skill.md` — Read when specifying UI features (design system, layout, components).
+
+## Input
+
+`#10` is either:
+
+- A GitHub Issue number (e.g., `#42`) — fetch with `gh issue view`
+- A feature description (e.g., `PDF export button`)
+
+## Workflow
+
+### Step 1: Read Context
+
+1. Read the epic spec under `docs/specs/<epic>/`
+2. If an issue number is provided, fetch it with `gh issue view`
+3. Identify what feature/component you are specifying
+
+### Step 2: Investigate Codebase
+
+1. Use Grep, Glob, Read to understand relevant code areas
+2. Identify existing patterns, data models, APIs
+3. Find code that will be affected by this feature
+
+### Step 3: Clarify Ambiguities
+
+Use AskUserQuestion iteratively:
+
+- 2-4 questions per round
+- Provide 2-4 concrete options per question
+- Focus on:
+  - Functional behavior (what happens when...)
+  - Edge cases (what if...)
+  - Non-functional requirements (performance, security)
+  - Integration points (how does this connect to...)
+
+### Step 4: Create Worktree & Write Feature Spec
+
+Create a docs-only worktree for this feature:
+
+```
+EnterWorktree({ name: "docs/<epic>-<feature>" })
+```
+
+Then inside the worktree, create `docs/specs/<epic>/<feature>/` with 2 files:
+
+#### requirements.md
+
+```markdown
+# Requirements: <Feature Name>
+
+## Functional Requirements
+
+### P1 (Must have)
+
+-
+
+### P2 (Should have)
+
+-
+
+### P3 (Nice to have)
+
+-
+
+## Non-Functional Requirements
+
+-
+
+## Edge Cases
+
+1.
+2.
+3.
+
+## Constraints
+
+-
+```
+
+#### design.md
+
+```markdown
+# Design: <Feature Name>
+
+## Current State
+
+<!-- What exists today -->
+
+## Proposed Changes
+
+<!-- What we're building / changing -->
+
+## Backend Spec
+
+<!-- API endpoints, data models, processing flow -->
+
+## Tracking
+
+| Event Name | Properties | Trigger Condition |
+| ---------- | ---------- | ----------------- |
+|            |            |                   |
+```
+
+### Step 5: User Confirmation
+
+Present generated files for review. Handle modifications if requested.
+
+### Step 6: Create Docs-Only PR
+
+Commit and push the spec documents:
+
+```bash
+git add docs/specs/<epic>/<feature>/requirements.md docs/specs/<epic>/<feature>/design.md
+git commit -m "docs: <epic>/<feature> スペック追加"
+git push -u origin HEAD
+```
+
+Create a PR for review:
+
+```bash
+gh pr create \
+  --title "docs: <feature> スペック" \
+  --label "docs" \
+  --body "$(cat <<'EOF'
+## 概要
+
+<!-- 1-2 sentence summary from requirements.md -->
+
+## スペック
+
+- `docs/specs/<epic>/<feature>/requirements.md`
+- `docs/specs/<epic>/<feature>/design.md`
+
+## レビュー観点
+
+- [ ] 要件は明確で検証可能か
+- [ ] 設計は既存パターンと整合しているか
+- [ ] エッジケースは網羅されているか
+EOF
+)"
+```
+
+Open in browser:
+
+```bash
+gh pr view --web
+```
+
+## Output
+
+- `docs/specs/<epic>/<feature>/requirements.md`
+- `docs/specs/<epic>/<feature>/design.md`
+
+## Rules
+
+- Always respond in the user's language
+- Always read existing code before asking questions
+- Keep questions grounded in what you found in the codebase
+- Do not prescribe implementation details in requirements — keep them behavior-focused
+- Design.md should describe WHAT changes, not HOW to code them
+- Limit each AskUserQuestion round to 2-4 questions
+
+## Next Step
+
+Run `/kitchen:prep` to create an implementation plan and decompose into TODO tasks.
+
+---
+
+PR命は英語に
+
+---
+
+マージした。
+
+---
+
+# Prep Command
+
+You are a planning and decomposition specialist who turns feature specs into actionable implementation plans with explicit dependency graphs. Each task must be self-contained — executable from its description alone, with concrete verification steps.
+
+## Your Skills
+
+Read and follow these skill documents when working:
+
+- `registry/skills/coding-standards.md` — Read to align implementation plan with project coding standards.
+- `registry/skills/backend-patterns.md` — Read when planning backend implementation phases (API, DB, server-side).
+- `registry/skills/frontend-patterns.md` — Read when planning frontend implementation phases (React, Next.js, state).
+
+## Input
+
+No arguments required. Reads the most recent feature spec created by `/kitchen:recipe`.
+
+If `` is provided, treat it as a path to the feature spec directory (e.g., `docs/specs/pdf-export/export-button`).
+
+## Workflow
+
+### Step 0: Review Lessons
+
+Read `tasks/lessons.md` if it exists. Apply any relevant patterns or warnings to this planning session. Past mistakes inform better decomposition.
+
+### Step 1: Read Feature Spec
+
+1. Read `docs/specs/<epic>/<feature>/requirements.md`
+2. Read `docs/specs/<epic>/<feature>/design.md`
+3. Read the epic-level spec for context (overview.md, scope.md)
+
+### Step 2: Explore the Codebase (via Subagents)
+
+Use `Task` subagents to explore the codebase in parallel. Keep the main context window clean by offloading research.
+
+```
+# Launch exploration subagents in parallel
+Task({ prompt: "List all directories under src/. Identify modules, entry points, and key config files. Return a structured summary.", subagent_type: "Explore" })
+Task({ prompt: "Find how similar features are implemented. Search for patterns like [X]. Return file paths, function signatures, and approach used.", subagent_type: "Explore" })
+Task({ prompt: "Identify all files that will be affected by [feature]. Check imports, type dependencies, and test files. Return a file impact list.", subagent_type: "Explore" })
+```
+
+Synthesize subagent findings into:
+
+- **Project structure** — What directories, modules, and packages exist?
+- **Existing patterns** — How are similar features currently implemented?
+- **Affected files** — Which files will need changes?
+- **Dependencies** — What libraries, APIs, or internal modules are involved?
+
+Do not decompose what you haven't explored.
+
+### Step 3: Create Implementation Plan
+
+1. **Architecture review** — Identify affected components, files, APIs
+2. **Phase breakdown** — Group changes by dependency order
+3. **Risk assessment** — Flag HIGH/MEDIUM/LOW risks
+4. **Testing strategy** — What to test at each phase
+
+Present the plan and wait for user confirmation.
+
+### Step 4: Clarify Unclear Points
+
+Use AskUserQuestion to resolve ambiguities before decomposing:
+
+- 2-4 questions per round, each with 2-4 concrete options
+- Focus on:
+  - **Scope**: Should X be included in this task or split separately?
+  - **Approach**: Modify existing code or create new?
+  - **Ordering**: Must X come before Y, or can they run in parallel?
+  - **Granularity**: One task or split into sub-tasks?
+  - **Risk**: Should we add an exploration/spike task for uncertain areas?
+- Don't ask obvious questions — dig into the hard parts the user might not have considered
+- Continue until all unclear points affecting decomposition are resolved
+
+### Step 5: Decompose into Tasks
+
+For each phase, create task-level items. Each task must be:
+
+- **Specific** — Clear action verb, exact file paths, specific function/class names
+- **Achievable** — No external blockers, all info included to execute
+- **Small enough** — 5-30 minutes of focused work, single responsibility
+- **Verifiable** — Concrete proof of correctness, not "it looks right"
+
+Use this description template for every task:
+
+```
+What: [Specific action to take]
+Where: [Exact file paths, function/class names, line ranges]
+How: [Implementation approach referencing existing patterns in the codebase]
+Why: [Purpose and how it fits into the larger task]
+Verify: [Concrete verification — test command + expected output, or behavioral diff]
+Files: [All files this task touches — used for conflict detection in cook]
+```
+
+### Step 6: Enter Feature Worktree
+
+Create the implementation worktree before writing the plan. This ensures `tasks/todo.md` is written directly into the worktree, and cook can continue from the same branch.
+
+```
+EnterWorktree({ name: "feat/<issue-number>-<short-desc>" })
+```
+
+If `` contains `#number`, use that issue number. Otherwise, derive the branch name from the feature spec directory name.
+
+### Step 7: Build Dependency Graph
+
+Analyze task dependencies and build a layered execution graph. This graph is the primary input for `/kitchen:cook`'s execution strategy (Task vs Team selection).
+
+For each task, determine:
+- **Depends on**: Which tasks must complete before this one can start?
+- **Touches files**: Which files does this task modify? (Tasks editing the same file cannot run in parallel)
+- **Produces**: What artifacts (types, APIs, schemas) does this task create that others consume?
+
+#### Output Format
+
+Write the dependency graph to `tasks/todo.md` using this structure:
+
+```markdown
+# Implementation Plan: <feature name>
+
+## Dependency Graph
+
+Phase 1: [#1 <short name>] → [#2 <short name>]
+                                ↓
+Phase 2:                      [#3 <short name>] → [#4 <short name>]
+                                ↓              ↓ [#5 <short name>]
+Phase 3:                      [#6 <short name>]
+                                ↓
+Phase 4: [#7 <short name>] → [#8 <short name>]
+                             → [#9 <short name>]
+
+Parallel: #4/#5 (both depend on #3), #8/#9 (both depend on #7)
+
+## Tasks
+
+- [ ] #1 <action verb + description>
+  What: ...
+  Where: ...
+  How: ...
+  Why: ...
+  Verify: ...
+  Files: ...
+  Depends: (none)
+
+- [ ] #2 <action verb + description>
+  ...
+  Depends: #1
+```
+
+#### Graph Rules
+
+- An arrow `→` means "then" (sequential dependency)
+- An arrow `↓` means the next phase depends on the one above
+- Tasks on the same phase line with no arrow between them can run in parallel
+- The `Parallel:` summary line explicitly lists which tasks can be parallelized and why
+- The `Files:` field in each task enables cook to detect file conflicts between parallel tasks
+
+### Step 8: Write to TodoWrite
+
+Use TodoWrite to create all tasks in implementation order. Every task must have:
+
+- Content starting with an action verb (Create, Implement, Add, Update, etc.)
+- Rich description following the What/Where/How/Why/Verify/Files template
+- Status set to `pending`
+
+TodoWrite serves as the runtime tracker. `tasks/todo.md` serves as the persistent plan with the dependency graph.
+
+### Step 9: Self-Review
+
+Before presenting the plan, verify it against a staff-engineer standard:
+
+- [ ] Does every task have a concrete `Verify` step (not just "check it works")?
+- [ ] Does the dependency graph correctly reflect file-level conflicts?
+- [ ] Are there tasks that could be further parallelized?
+- [ ] Would a staff engineer approve this decomposition?
+- [ ] Does the full set of tasks cover the entire feature spec?
+
+If gaps are found, return to Step 4 for clarification or Step 5 for re-decomposition.
+
+## Rules
+
+- Always respond in the user's language
+- Always present the plan before proceeding
+- Wait for user confirmation at plan stage
+- Tasks should be 5-30 minutes of work each
+- Each task must have clear acceptance criteria (Verify field)
+- Every task must reference real code — actual file paths, function names, and existing patterns
+- Do NOT create GitHub Issues — that is handled separately
+- Use subagents for exploration, not inline analysis — keep the main context clean
+- The dependency graph in `tasks/todo.md` is the contract between prep and cook
+
+## Next Step
+
+Once task decomposition is complete, instruct the user to:
+
+1. Exit this Claude session
+2. Run the following command to relaunch in teammate mode:
+
+```bash
+claude --dangerously-skip-permissions --teammate-mode tmux --continue
+```
+
+3. Run `/kitchen:cook` to start TDD implementation — cook will read the dependency graph from `tasks/todo.md` to choose its execution strategy (Task subagents vs Team coordination)
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+続けていいですが、これは考慮しておいてください。レビュー来てました P1 Badge Use collision-free cache key serialization
+
+The filename rule here is not one-to-one, so distinct valid targets can overwrite each other’s cache entries and later return the wrong Result. For example, npm identifiers @a/b_c and @a_b/c are both accepted by internal/provider/npm/npm.go’s package regex, but both collapse to npm__a_b_c.json under this replacement scheme. This breaks cache correctness whenever such key pairs are queried within TTL, so the spec should require a reversible encoding (or hashing) instead of simple character replacement.
+
+Useful? React with 👍 / 👎.
+
+---
+
+[Request interrupted by user]
+
+---
+
+専用のワークツリーに入るように
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+専用のワークツリーで。Creating worktree
+
+---
+
+続けて
+
+---
+
+<bash-input>pwd</bash-input>
+
+---
+
+<bash-stdout>/home/yuta/ghq/github.com/yutakobayashidev/repiq</bash-stdout><bash-stderr></bash-stderr>
+
+---
+
+<bash-input>/kitchen:serve</bash-input>
+
+---
+
+<bash-stdout>(eval):1: no such file or directory: /kitchen:serve
+</bash-stdout><bash-stderr>(eval):1: no such file or directory: /kitchen:serve
+</bash-stderr>
+
+---
+
+# Serve Command
+
+You are a delivery specialist who reviews code quality, cleans up AI-generated noise, and creates a polished Pull Request.
+
+## Your Skills
+
+Read and follow these skill documents when reviewing:
+
+- `registry/skills/coding-standards.md` — Read and use as review criteria for code quality checks.
+- `registry/deslop/skills/deslop/SKILL.md` — Read for patterns to identify and remove AI-generated code slop.
+
+## Input
+
+No arguments required. Reviews all changes on the current feature branch vs main.
+
+If `` is provided, treat it as the issue number for the PR body (e.g., `#42`).
+
+## Workflow
+
+### Step 0: Verify Worktree
+
+Run `git branch --show-current` and verify you are in the feature worktree created by `/kitchen:cook`. If on `main` or an unexpected branch, use AskUserQuestion to ask the user which worktree to use.
+
+### Step 1: Code Review
+
+Review all changes since branching from main:
+
+```bash
+git diff main...HEAD --name-only
+```
+
+For each changed file, check:
+
+**Security (CRITICAL):**
+
+- Hardcoded credentials, API keys, tokens
+- SQL injection, XSS vulnerabilities
+- Missing input validation
+- Path traversal risks
+
+**Quality (HIGH):**
+
+- Functions > 50 lines
+- Files > 800 lines
+- Nesting depth > 4 levels
+- Missing error handling
+- console.log statements
+
+**Best Practices (MEDIUM):**
+
+- Mutation patterns (should be immutable)
+- Missing tests for new code
+- Accessibility issues
+
+Present findings with severity, file location, and suggested fixes.
+Block PR creation if CRITICAL or HIGH issues remain.
+
+### Step 2: Deslop
+
+Remove AI-generated noise:
+
+- Verbose comments that restate the code
+- Excessive null checks on internally-controlled values
+- Unnecessary try/catch around safe operations
+- Over-abstracted helpers for one-time operations
+- `// removed` or `// deprecated` placeholder comments
+- Unused `_` prefixed variables kept for "backwards compatibility"
+
+### Step 3: Verify Tests
+
+```bash
+npm test  # or the project's test command
+```
+
+All tests must pass before creating PR.
+
+### Step 4: User Confirmation
+
+Present:
+
+- Review summary (issues found and fixed)
+- Test results
+- Files changed
+- Ask user to confirm PR creation
+
+### Step 5: Create PR
+
+```bash
+git push origin HEAD -u
+```
+
+Then create a draft PR:
+
+```bash
+gh pr create --draft \
+  --title "<concise title>" \
+  --body "$(cat <<'EOF'
+## Summary
+- <what changed and why>
+
+## Related
+- Closes #<issue-number>
+- Spec: `docs/specs/<epic>/<feature>/`
+
+## Test Plan
+- [ ] <how to verify>
+
+## What This PR Does NOT Do
+- <explicit out-of-scope items>
+EOF
+)"
+```
+
+Open in browser:
+
+```bash
+gh pr view --web
+```
+
+## PR Rules
+
+- Always respond in the user's language
+- Title: under 70 characters, descriptive
+- Body: Summary + Related + Test Plan + Out of Scope
+- Always include `Closes #<issue-number>`
+- Always link to spec directory
+- Create as draft (not ready for review)
+- Push before creating PR
+
+## Review Severity Guide
+
+| Severity | Action             | Example                              |
+| -------- | ------------------ | ------------------------------------ |
+| CRITICAL | Must fix before PR | Hardcoded secrets, SQL injection     |
+| HIGH     | Must fix before PR | Missing error handling, mutation     |
+| MEDIUM   | Fix if time allows | Missing JSDoc, accessibility         |
+| LOW      | Note for future    | Style preference, minor optimization |
+
+## Next Step
+
+Done! The draft PR is ready for PM review.
+
+---
+
+続けて
+
+---
+
+手動で実行してみて
+
+---
+
+LRU evictionってなに？
+
+---
+
+結果を本文に追記しておいて
+
+---
+
+LRUとは何かについても説明を追加しておいて、学習メモ
+
+---
+
+それmainにコミットしといて
