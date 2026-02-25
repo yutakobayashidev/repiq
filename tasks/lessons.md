@@ -40,3 +40,16 @@ deps.dev v3alpha API には Go パッケージ向けに2つの類似エンドポ
 1. 外部 API を使う前に、必ず `curl` で実際のレスポンスを確認する
 2. 設計ドキュメントに書いた API エンドポイントは実装前に疎通確認する
 3. テストのモックだけで安心しない — モックは実 API と乖離している可能性がある
+
+### リリースは CI に任せる — 手動で `gh release create` しない
+
+**何が起きたか:**
+`git tag v0.3.0 && git push origin v0.3.0` の後、手動で `gh release create` を実行した。しかし `.github/workflows/release.yml` で goreleaser が tag push をトリガーに自動リリースを作る CI が設定されていた。結果、goreleaser のリリースと手動リリースが衝突した。
+
+**対応:**
+手動リリースを `gh release delete` で削除し、goreleaser ワークフローを `gh run rerun` で再実行して復旧した。
+
+**ルール:**
+1. リリースを作る前に `.github/workflows/` を確認し、tag push トリガーの CI がないか確認する
+2. goreleaser 等のリリース CI がある場合は `git tag` + `git push --tags` のみ行い、リリース作成は CI に任せる
+3. 手動で `gh release create` するのはリリース CI が存在しない場合のみ

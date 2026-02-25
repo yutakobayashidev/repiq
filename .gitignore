@@ -32,7 +32,7 @@ go.work.sum
 .pre-commit-config.yaml
 
 # Internal task tracking
-tasks/
+tasks/todo.md
 
 # GoReleaser
 dist/
