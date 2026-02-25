@@ -1,0 +1,69 @@
+Implement the following plan:
+
+# Plan: ライセンス比較強化 + ダウンロードトレンド対応
+
+## Context
+
+scenario-test.md の「改善の余地」で挙がった2点を対応する:
+1. ライセンス比較が散在していて企業採用判断に使いにくい
+2. DL数のトレンドがわからず新興ライブラリの評価精度が低い
+
+## 方針
+
+repiq の "no opinions, no scores" を維持し、生データ追加のみ。エージェントが解釈する。
+
+## 変更内容
+
+### 1. GitHub provider に `license` フィールド追加
+
+既に `client.Repositories.Get()` で取得済みのデータから `License.SPDXID` を抽出するだけ。追加 API コール不要。
+
+- `internal/provider/provider.go` — `GitHubMetrics` に `License string` 追加
+- `internal/provider/github/github.go` — `repoInfo.GetLicense().GetSPDXID()` 抽出 (nil-safe)
+- `internal/provider/github/github_test.go` — mock に license 追加、アサーション追加
+- `internal/format/format.go` — GitHub テーブルに license 列追加
+- `README.md` — GitHub メトリクス (8 → 9)
+
+### 2. npm provider に `monthly_downloads` フィールド追加
+
+npm API は `/downloads/point/last-month/{package}` をサポートしており、`last-week` と同一レスポンス形式。PyPI と同等の粒度になる。
+
+- `internal/provider/provider.go` — `NPMMetrics` に `MonthlyDownloads int` 追加
+- `internal/provider/npm/npm.go` — `fetchMonthlyDownloads` メソッド追加 + jobs に並列実行追加
+- `internal/provider/npm/npm_test.go` — 全テストケースに monthly mock 追加
+- `internal/format/format.go` — npm テーブルに monthly_downloads 列追加
+- `README.md` — npm メトリクス (5 → 6)
+
+### トレンドの解釈
+
+npm と PyPI の両方が weekly + monthly を持つようになるため、エージェントは `weekly * 4 / monthly` で加速/減速を推定可能。crates.io は `recent_downloads` (90日) が既にある。
+
+## コミット戦略
+
+2コミットに分離:
+1. `feat(github): add license metric`
+2. `feat(npm): add monthly downloads metric`
+
+## 検証
+
+- `go test ./...` 全パス
+- `go run ./cmd/repiq github:facebook/react` で license 列が表示される
+- `go run ./cmd/repiq npm:react` で monthly_downloads 列が表示される
+- `golangci-lint run ./...` パス
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /home/yuta/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+no veeify
+
+---
+
+specsも更新しておいて

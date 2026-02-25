@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "86aff6785f97",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/specs/core/cli-github/design.md",
+    "docs/specs/core/cli-github/requirements.md",
+    "docs/specs/core/overview.md",
+    "docs/specs/npm/overview.md",
+    "docs/specs/npm/provider/design.md",
+    "docs/specs/npm/provider/requirements.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/86/aff6785f97/0/metadata.json",
+      "transcript": "/86/aff6785f97/0/full.jsonl",
+      "context": "/86/aff6785f97/0/context.md",
+      "content_hash": "/86/aff6785f97/0/content_hash.txt",
+      "prompt": "/86/aff6785f97/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 177,
+    "cache_creation_tokens": 190357,
+    "cache_read_tokens": 2875304,
+    "output_tokens": 2474,
+    "api_call_count": 53
+  }
+}
