@@ -1,0 +1,17 @@
+README,InstallのあとにAgents Skills持ってくるようにして
+
+---
+
+flake.nix,flake partsを使うようにして、.envrc ignore
+
+---
+
+コミットして
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+no verify
