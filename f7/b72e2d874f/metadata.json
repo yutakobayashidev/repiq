@@ -3,7 +3,7 @@
   "checkpoint_id": "f7b72e2d874f",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
+  "checkpoints_count": 2,
   "files_touched": [
     "README.md",
     "docs/specs/agent-skills/skill/design.md",
@@ -23,13 +23,20 @@
       "context": "/f7/b72e2d874f/0/context.md",
       "content_hash": "/f7/b72e2d874f/0/content_hash.txt",
       "prompt": "/f7/b72e2d874f/0/prompt.txt"
+    },
+    {
+      "metadata": "/f7/b72e2d874f/1/metadata.json",
+      "transcript": "/f7/b72e2d874f/1/full.jsonl",
+      "context": "/f7/b72e2d874f/1/context.md",
+      "content_hash": "/f7/b72e2d874f/1/content_hash.txt",
+      "prompt": "/f7/b72e2d874f/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 2164,
-    "cache_creation_tokens": 640924,
-    "cache_read_tokens": 20501932,
-    "output_tokens": 30933,
-    "api_call_count": 217
+    "input_tokens": 4540,
+    "cache_creation_tokens": 697181,
+    "cache_read_tokens": 22157764,
+    "output_tokens": 33621,
+    "api_call_count": 255
   }
 }
