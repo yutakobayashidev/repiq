@@ -34,6 +34,9 @@ go.work.sum
 # Internal task tracking
 tasks/
 
+# GoReleaser
+dist/
+
 # Tool-specific config
 .entire/
 
