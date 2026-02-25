@@ -42,13 +42,20 @@ repiq github:facebook/react
 
 ## Use Cases
 
-**Compare libraries for the same task**
+- **Library comparison** -- compare downloads, maintenance activity, and dependency count across candidates in one command
+- **Maintenance check** -- `last_commit_days`, `commits_30d`, and `issues_closed_30d` reveal whether a project is abandoned, stable, or actively developed
+- **Download trends** -- `weekly_downloads` vs `monthly_downloads` (npm, PyPI): `weekly * 4 / monthly > 1` means accelerating adoption
+- **License compliance** -- SPDX license identifiers from GitHub, npm, PyPI, crates.io, and Go for quick enterprise checks
+- **Supply chain risk** -- `dependencies_count` shows how much a package pulls in; `reverse_dependencies` (crates.io) shows ecosystem penetration
+- **Cross-ecosystem evaluation** -- compare equivalent packages across languages (e.g. zod vs pydantic vs serde) using GitHub as the common axis
+
+### Examples
+
+**Compare web frameworks**
 
 ```bash
-repiq npm:express npm:fastify npm:hono
+repiq github:expressjs/express github:fastify/fastify github:honojs/hono npm:express npm:fastify npm:hono
 ```
-
-An agent can compare `weekly_downloads`, `last_commit_days`, and `dependencies_count` to recommend the best fit.
 
 **Check if a repo is still maintained**
 
@@ -56,15 +63,23 @@ An agent can compare `weekly_downloads`, `last_commit_days`, and `dependencies_c
 repiq github:some-org/some-lib
 ```
 
-`last_commit_days: 400` and `issues_closed_30d: 0` tells the agent this project may be abandoned.
+**Evaluate ORM options**
+
+```bash
+repiq github:prisma/prisma github:drizzle-team/drizzle-orm github:typeorm/typeorm npm:prisma npm:drizzle-orm npm:typeorm
+```
+
+**License check for enterprise adoption**
+
+```bash
+repiq github:facebook/react github:preactjs/preact github:sveltejs/svelte
+```
 
 **Cross-ecosystem comparison**
 
 ```bash
 repiq npm:zod pypi:pydantic crates:serde
 ```
-
-Compare equivalent packages across languages using downloads, dependency count, and license.
 
 ## Supported Providers
 
