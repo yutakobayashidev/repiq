@@ -88,8 +88,8 @@ Response (抜粋):
 - `downloads`: `crate.downloads`
 - `recent_downloads`: `crate.recent_downloads`
 - `latest_version`: `crate.max_stable_version` (null なら `crate.newest_version`)
-- `last_publish_days`: `versions[0].created_at` (最新バージョン) から算出
-- `license`: `versions[0].license`
+- `last_publish_days`: `latest_version` に一致する `versions` エントリの `created_at` から算出
+- `license`: `latest_version` に一致する `versions` エントリの `license`
 
 **依存関係**
 

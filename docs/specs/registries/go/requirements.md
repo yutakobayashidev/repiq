@@ -17,7 +17,7 @@
 
 ### P2 (Should have)
 
-- proxy.golang.org と deps.dev API への並列リクエストでレスポンスタイムを最小化する
+- proxy.golang.org でバージョン取得後、deps.dev API の 2 エンドポイントを並列リクエストする 2 段階フローでレスポンスタイムを最小化する (deps.dev エンドポイントにバージョン番号が必要なため)
 - deps.dev API が失敗しても proxy.golang.org の結果を部分的に返す (partial results)
 
 ### P3 (Nice to have)
