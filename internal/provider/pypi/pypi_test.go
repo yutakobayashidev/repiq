@@ -262,6 +262,51 @@ func TestFetchNullRequiresDist(t *testing.T) {
 	}
 }
 
+func TestFetchLicenseExpressionFallback(t *testing.T) {
+	pypiMux := http.NewServeMux()
+	pypiMux.HandleFunc("GET /pypi/pep639-pkg/json", func(w http.ResponseWriter, _ *http.Request) {
+		// license is null, license_expression has the value (PEP 639)
+		_, _ = w.Write([]byte(`{
+			"info": {
+				"version": "2.0.0",
+				"license": null,
+				"license_expression": "MIT",
+				"requires_python": ">=3.9",
+				"requires_dist": null
+			},
+			"releases": {
+				"2.0.0": [{"upload_time_iso_8601": "` + time.Now().Add(-3*24*time.Hour).Format(time.RFC3339) + `"}]
+			}
+		}`))
+	})
+	pypiSrv := httptest.NewServer(pypiMux)
+	defer pypiSrv.Close()
+
+	statsMux := http.NewServeMux()
+	statsMux.HandleFunc("GET /api/packages/pep639-pkg/recent", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{
+			"data": map[string]any{"last_day": 10, "last_week": 100, "last_month": 500},
+		})
+	})
+	statsSrv := httptest.NewServer(statsMux)
+	defer statsSrv.Close()
+
+	p := New(pypiSrv.URL, statsSrv.URL)
+	result, err := p.Fetch(context.Background(), "pep639-pkg")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Error != "" {
+		t.Fatalf("unexpected result error: %s", result.Error)
+	}
+	if result.PyPI == nil {
+		t.Fatal("expected PyPI metrics to be set")
+	}
+	if result.PyPI.License != "MIT" {
+		t.Errorf("license: got %q, want %q", result.PyPI.License, "MIT")
+	}
+}
+
 func TestFetchExtrasExcluded(t *testing.T) {
 	pypiMux := http.NewServeMux()
 	pypiMux.HandleFunc("GET /pypi/extras-pkg/json", func(w http.ResponseWriter, _ *http.Request) {

@@ -1,4 +1,4 @@
-# ユースケースシミュレーション
+# シナリオテスト
 
 repiq を AI エージェントのツールとして実際のライブラリ選定シナリオで使用し、有用性を検証した記録。
 
@@ -105,6 +105,58 @@ repiq github:seanmonstar/reqwest github:hyperium/hyper crates:reqwest crates:hyp
 
 ---
 
+## シナリオ4: クロスエコシステム バリデーションライブラリ比較
+
+「TypeScript の zod、Python の pydantic、Rust の serde。同じ役割のライブラリをエコシステム横断で比較したい」という質問を想定。
+
+```bash
+repiq github:colinhacks/zod github:pydantic/pydantic github:serde-rs/serde npm:zod pypi:pydantic crates:serde
+```
+
+### 結果 (2026-02-25 時点)
+
+**GitHub メトリクス:**
+
+| target | stars | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d |
+|---|---|---|---|---|---|---|---|
+| colinhacks/zod | 41,952 | 251 | 464 | 201 | 9 | 12 | 24 |
+| pydantic/pydantic | 26,996 | 554 | 459 | 192 | 0 | 43 | 23 |
+| serde-rs/serde | 10,477 | 370 | 180 | 321 | 9 | 15 | 1 |
+
+**npm メトリクス:**
+
+| target | weekly_downloads | dependencies_count | license |
+|---|---|---|---|
+| npm:zod | 95,185,214 | 0 | MIT |
+
+**PyPI メトリクス:**
+
+| target | weekly_downloads | dependencies_count | license |
+|---|---|---|---|
+| pypi:pydantic | 146,801,915 | 5 | *(空)* |
+
+**crates.io メトリクス:**
+
+| target | downloads | recent_downloads | dependencies_count | license | reverse_dependencies |
+|---|---|---|---|---|---|
+| crates:serde | 835,433,978 | 116,815,564 | 2 | MIT OR Apache-2.0 | 72,729 |
+
+### 考察
+
+- **DL 数は直接比較できない**: npm / PyPI / crates.io はダウンロードの数え方が異なる（CI 頻度、ロックファイル解決の粒度、ミラー含む/含まない等）。「zod 9,500万 vs pydantic 1.4億」を見て pydantic の方が人気とは言えない
+- **依存数の設計思想が明確に出る**: zod 0、serde 2、pydantic 5。いずれもバリデーション層の根幹なので依存を絞る設計だが、pydantic は pydantic-core (Rust バインディング) 等を含むため若干多い
+- **serde の reverse_dependencies 72,729 は圧倒的**: Rust エコシステムの事実上の標準。stars は最少だが、エコシステムへの浸透度は他を大きく引き離している
+- **メンテナンス状況**: pydantic が commits_30d 43 で最も活発。serde は issues_closed_30d 1 だが、成熟ライブラリで新規 issue 自体が少ないため問題ない
+- **pydantic の license が空**: PyPI API の `license` フィールドが null（PEP 639 で `license_expression` に移行中）。repiq 側の対応が必要
+
+### クロスエコシステム比較で見えた限界
+
+- 各レジストリで取得できるメトリクスが異なるため、テーブルがプロバイダーごとに分かれる。横並びで「同じ軸」で比較しにくい
+- DL 数の意味がエコシステムごとに違うため、数値の大小だけでは判断を誤る。エージェントがこの文脈を理解して解釈する必要がある
+- GitHub メトリクスだけが唯一の共通軸として機能する
+
+---
+
 ## 総合評価
 
 ### repiq が活きるポイント
@@ -119,6 +171,8 @@ repiq github:seanmonstar/reqwest github:hyperium/hyper crates:reqwest crates:hyp
 - **ライセンス比較の強調**: 企業での採用判断では最重要ファクターの一つ
 - **トレンド（時系列変化）の欠如**: 「半年前と比べて DL 数が伸びてるか」がわかると、新興ライブラリの評価精度が上がる
 - **PyPI Stats API のレートリミット**: 複数パッケージを短時間に叩くと 429 が出やすい
+- **PyPI の `license_expression` 未対応**: PEP 639 移行済みパッケージで license が空になる（シナリオ4で発覚）
+- **クロスエコシステム比較の出力**: プロバイダーごとにテーブルが分かれるため、横並び比較がしにくい。GitHub メトリクスだけが共通軸になる
 
 ### 結論
 

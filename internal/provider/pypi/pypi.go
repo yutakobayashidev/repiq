@@ -75,6 +75,9 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 			mu.Lock()
 			metrics.LatestVersion = meta.Info.Version
 			metrics.License = meta.Info.License
+			if metrics.License == "" {
+				metrics.License = meta.Info.LicenseExpression
+			}
 			metrics.RequiresPython = meta.Info.RequiresPython
 			metrics.DependenciesCount = countNonExtraDeps(meta.Info.RequiresDist)
 			metrics.LastPublishDays = meta.lastPublishDays()
@@ -129,10 +132,11 @@ type pypiResponse struct {
 }
 
 type pypiInfo struct {
-	Version        string   `json:"version"`
-	License        string   `json:"license"`
-	RequiresPython string   `json:"requires_python"`
-	RequiresDist   []string `json:"requires_dist"`
+	Version           string   `json:"version"`
+	License           string   `json:"license"`
+	LicenseExpression string   `json:"license_expression"`
+	RequiresPython    string   `json:"requires_python"`
+	RequiresDist      []string `json:"requires_dist"`
 }
 
 type pypiReleaseFile struct {
