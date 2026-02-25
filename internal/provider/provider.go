@@ -12,13 +12,46 @@ type Provider interface {
 type Result struct {
 	Target string         `json:"target"`
 	GitHub *GitHubMetrics `json:"github,omitempty"`
-	NPM    *NPMMetrics    `json:"npm,omitempty"`
+	NPM    *NPMMetrics   `json:"npm,omitempty"`
+	PyPI   *PyPIMetrics   `json:"pypi,omitempty"`
+	Crates *CratesMetrics `json:"crates,omitempty"`
+	Go     *GoMetrics     `json:"go,omitempty"`
 	Error  string         `json:"error,omitempty"`
 }
 
 // NPMMetrics holds npm registry metrics.
 type NPMMetrics struct {
 	WeeklyDownloads   int    `json:"weekly_downloads"`
+	LatestVersion     string `json:"latest_version"`
+	LastPublishDays   int    `json:"last_publish_days"`
+	DependenciesCount int    `json:"dependencies_count"`
+	License           string `json:"license"`
+}
+
+// PyPIMetrics holds PyPI registry metrics.
+type PyPIMetrics struct {
+	WeeklyDownloads   int    `json:"weekly_downloads"`
+	MonthlyDownloads  int    `json:"monthly_downloads"`
+	LatestVersion     string `json:"latest_version"`
+	LastPublishDays   int    `json:"last_publish_days"`
+	DependenciesCount int    `json:"dependencies_count"`
+	License           string `json:"license"`
+	RequiresPython    string `json:"requires_python"`
+}
+
+// CratesMetrics holds crates.io registry metrics.
+type CratesMetrics struct {
+	Downloads           int    `json:"downloads"`
+	RecentDownloads     int    `json:"recent_downloads"`
+	LatestVersion       string `json:"latest_version"`
+	LastPublishDays     int    `json:"last_publish_days"`
+	DependenciesCount   int    `json:"dependencies_count"`
+	License             string `json:"license"`
+	ReverseDependencies int    `json:"reverse_dependencies"`
+}
+
+// GoMetrics holds Go module proxy metrics.
+type GoMetrics struct {
 	LatestVersion     string `json:"latest_version"`
 	LastPublishDays   int    `json:"last_publish_days"`
 	DependenciesCount int    `json:"dependencies_count"`

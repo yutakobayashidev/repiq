@@ -144,26 +144,227 @@ func TestMarkdownNPM(t *testing.T) {
 	}
 }
 
-func TestMarkdownMixed(t *testing.T) {
+func TestMarkdownPyPI(t *testing.T) {
 	var buf bytes.Buffer
-	results := sampleResults()
+	results := []provider.Result{
+		{
+			Target: "pypi:requests",
+			PyPI: &provider.PyPIMetrics{
+				WeeklyDownloads:   5000000,
+				MonthlyDownloads:  20000000,
+				LatestVersion:     "2.31.0",
+				LastPublishDays:   30,
+				DependenciesCount: 5,
+				License:           "Apache-2.0",
+				RequiresPython:    ">=3.7",
+			},
+		},
+	}
 	if err := Markdown(&buf, results); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	output := buf.String()
-	// Should have both GitHub and npm tables
-	if !strings.Contains(output, "| stars |") {
-		t.Error("expected GitHub table header")
+	for _, want := range []string{
+		"| target |",
+		"| weekly_downloads |",
+		"| monthly_downloads |",
+		"| latest_version |",
+		"| last_publish_days |",
+		"| dependencies_count |",
+		"| license |",
+		"| requires_python |",
+		"| error |",
+		"pypi:requests",
+		"5000000",
+		"20000000",
+		"2.31.0",
+		"30",
+		"Apache-2.0",
+		">=3.7",
+	} {
+		if !strings.Contains(output, want) {
+			t.Errorf("expected %q in output, got:\n%s", want, output)
+		}
 	}
-	if !strings.Contains(output, "| weekly_downloads |") {
-		t.Error("expected npm table header")
+}
+
+func TestMarkdownCrates(t *testing.T) {
+	var buf bytes.Buffer
+	results := []provider.Result{
+		{
+			Target: "crates:serde",
+			Crates: &provider.CratesMetrics{
+				Downloads:           80000000,
+				RecentDownloads:     3000000,
+				LatestVersion:       "1.0.197",
+				LastPublishDays:     7,
+				DependenciesCount:   2,
+				License:             "MIT OR Apache-2.0",
+				ReverseDependencies: 30000,
+			},
+		},
 	}
-	if !strings.Contains(output, "facebook/react") {
-		t.Error("expected GitHub result in output")
+	if err := Markdown(&buf, results); err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
-	if !strings.Contains(output, "npm:react") {
-		t.Error("expected npm result in output")
+
+	output := buf.String()
+	for _, want := range []string{
+		"| target |",
+		"| downloads |",
+		"| recent_downloads |",
+		"| latest_version |",
+		"| last_publish_days |",
+		"| dependencies_count |",
+		"| license |",
+		"| reverse_dependencies |",
+		"| error |",
+		"crates:serde",
+		"80000000",
+		"3000000",
+		"1.0.197",
+		"7",
+		"MIT OR Apache-2.0",
+		"30000",
+	} {
+		if !strings.Contains(output, want) {
+			t.Errorf("expected %q in output, got:\n%s", want, output)
+		}
+	}
+}
+
+func TestMarkdownGo(t *testing.T) {
+	var buf bytes.Buffer
+	results := []provider.Result{
+		{
+			Target: "go:github.com/gin-gonic/gin",
+			Go: &provider.GoMetrics{
+				LatestVersion:     "v1.9.1",
+				LastPublishDays:   60,
+				DependenciesCount: 10,
+				License:           "MIT",
+			},
+		},
+	}
+	if err := Markdown(&buf, results); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	output := buf.String()
+	for _, want := range []string{
+		"| target |",
+		"| latest_version |",
+		"| last_publish_days |",
+		"| dependencies_count |",
+		"| license |",
+		"| error |",
+		"go:github.com/gin-gonic/gin",
+		"v1.9.1",
+		"60",
+		"10",
+		"MIT",
+	} {
+		if !strings.Contains(output, want) {
+			t.Errorf("expected %q in output, got:\n%s", want, output)
+		}
+	}
+}
+
+func TestMarkdownMixed(t *testing.T) {
+	var buf bytes.Buffer
+	results := []provider.Result{
+		{
+			Target: "github:facebook/react",
+			GitHub: &provider.GitHubMetrics{
+				Stars:           215000,
+				Forks:           45000,
+				OpenIssues:      1000,
+				Contributors:    1500,
+				ReleaseCount:    200,
+				LastCommitDays:  1,
+				Commits30d:      120,
+				IssuesClosed30d: 340,
+			},
+		},
+		{
+			Target: "npm:react",
+			NPM: &provider.NPMMetrics{
+				WeeklyDownloads:   25000000,
+				LatestVersion:     "19.1.0",
+				LastPublishDays:   15,
+				DependenciesCount: 2,
+				License:           "MIT",
+			},
+		},
+		{
+			Target: "pypi:requests",
+			PyPI: &provider.PyPIMetrics{
+				WeeklyDownloads:   5000000,
+				MonthlyDownloads:  20000000,
+				LatestVersion:     "2.31.0",
+				LastPublishDays:   30,
+				DependenciesCount: 5,
+				License:           "Apache-2.0",
+				RequiresPython:    ">=3.7",
+			},
+		},
+		{
+			Target: "crates:serde",
+			Crates: &provider.CratesMetrics{
+				Downloads:           80000000,
+				RecentDownloads:     3000000,
+				LatestVersion:       "1.0.197",
+				LastPublishDays:     7,
+				DependenciesCount:   2,
+				License:             "MIT OR Apache-2.0",
+				ReverseDependencies: 30000,
+			},
+		},
+		{
+			Target: "go:github.com/gin-gonic/gin",
+			Go: &provider.GoMetrics{
+				LatestVersion:     "v1.9.1",
+				LastPublishDays:   60,
+				DependenciesCount: 10,
+				License:           "MIT",
+			},
+		},
+		{
+			Target: "github:nonexistent/repo",
+			Error:  "GitHub API: 404 Not Found",
+		},
+	}
+	if err := Markdown(&buf, results); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	output := buf.String()
+
+	// All 5 provider tables should be present
+	for _, want := range []string{
+		"| stars |",                  // GitHub header
+		"| weekly_downloads |",      // npm header (also appears in PyPI, but both should exist)
+		"| monthly_downloads |",     // PyPI-specific header
+		"| recent_downloads |",      // crates-specific header
+		"| reverse_dependencies |",  // crates-specific header
+		"| requires_python |",       // PyPI-specific header
+		"facebook/react",            // GitHub data
+		"npm:react",                 // npm data
+		"pypi:requests",             // PyPI data
+		"crates:serde",              // crates data
+		"go:github.com/gin-gonic/gin", // Go data
+		"404 Not Found",             // error data
+	} {
+		if !strings.Contains(output, want) {
+			t.Errorf("expected %q in output, got:\n%s", want, output)
+		}
+	}
+
+	// Tables should be separated by blank lines
+	tables := strings.Split(output, "\n\n")
+	if len(tables) < 5 {
+		t.Errorf("expected at least 5 tables separated by blank lines, got %d sections", len(tables))
 	}
 }
 
