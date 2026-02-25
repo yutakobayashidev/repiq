@@ -33,7 +33,7 @@
 
 - [ ] `skills/repiq/SKILL.md` が Agent Skills 仕様に準拠している (skills-ref validate 通過)
 - [ ] `npx skills add github:yutakobayashidev/repiq` でインストール可能
-- [ ] Claude Code でスキルが発見・発動し、`repiq github:<repo>` 等が正しく実行される
+- [ ] Claude Code でスキルが発見・発動し、`repiq github:<owner>/<repo>` 等が正しく実行される
 - [ ] agent-skills-nix 経由で Nix 環境にインストール可能
 - [ ] SKILL.md が 500 行以内に収まっている (progressive disclosure 準拠)
 
