@@ -32,7 +32,7 @@ cli.Run
 
 - **保存先**: `os.UserCacheDir()/repiq/`
 - **形式**: 1 エントリ = 1 JSON ファイル
-- **ファイル名**: `scheme:identifier` から導出。`/` と `@` をアンダースコアに置換、`:` をアンダースコアに置換 (例: `github_facebook_react.json`, `npm__types_node.json`)
+- **ファイル名**: `scheme:identifier` の SHA-256 ハッシュ (hex) + `.json`。単純な文字置換では `npm:@a/b_c` と `npm:@a_b/c` が衝突するため、暗号学的ハッシュで一意性を保証する (例: `sha256("github:facebook/react").json`)
 - **ファイル内容**:
   ```json
   {
@@ -76,14 +76,14 @@ cli.Run
 
 ### キャッシュキー
 
-`scheme:identifier` をそのままキーとして使用。ファイル名への変換はストア内部で行う。
+`scheme:identifier` をそのままキーとして使用。ファイル名への変換はストア内部で `crypto/sha256` ハッシュにより行う。衝突のない可逆でないが一意なマッピングを保証する。
 
 | Target | Cache Key | File Name |
 |--------|-----------|-----------|
-| `github:facebook/react` | `github:facebook/react` | `github_facebook_react.json` |
-| `github:vercel/next.js` | `github:vercel/next.js` | `github_vercel_next.js.json` |
-| `npm:react` | `npm:react` | `npm_react.json` |
-| `npm:@types/node` | `npm:@types/node` | `npm__types_node.json` |
+| `github:facebook/react` | `github:facebook/react` | `a1b2c3...64hex.json` |
+| `npm:@types/node` | `npm:@types/node` | `d4e5f6...64hex.json` |
+| `npm:@a/b_c` | `npm:@a/b_c` | `(unique hash).json` |
+| `npm:@a_b/c` | `npm:@a_b/c` | `(different hash).json` |
 
 ## Tracking
 
