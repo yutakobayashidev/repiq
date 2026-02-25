@@ -14,7 +14,10 @@ import (
 	"github.com/yutakobayashidev/repiq/internal/provider"
 )
 
-var validPkgRe = regexp.MustCompile(`^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$`)
+var (
+	validPkgRe = regexp.MustCompile(`^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$`)
+	extraRe    = regexp.MustCompile(`;\s*extra\s*==`)
+)
 
 const (
 	defaultPyPIURL  = "https://pypi.org"
@@ -218,7 +221,7 @@ func (p *Provider) fetchDownloads(ctx context.Context, pkg string) (*statsRespon
 func countNonExtraDeps(deps []string) int {
 	count := 0
 	for _, d := range deps {
-		if !strings.Contains(d, "; extra ==") {
+		if !extraRe.MatchString(d) {
 			count++
 		}
 	}

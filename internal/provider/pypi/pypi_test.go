@@ -274,8 +274,8 @@ func TestFetchExtrasExcluded(t *testing.T) {
 					"core-dep>=1.0",
 					"another-dep<2.0",
 					`optional-a>=1.0; extra == "dev"`,
-					`optional-b>=2.0; extra == "test"`,
-					`optional-c>=3.0; extra == "docs"`,
+					`optional-b>=2.0;extra=="test"`,
+					`optional-c>=3.0 ;  extra  ==  "docs"`,
 				},
 			},
 			"releases": map[string]any{
