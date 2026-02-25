@@ -3,7 +3,7 @@
   "checkpoint_id": "86aff6785f97",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
+  "checkpoints_count": 2,
   "files_touched": [
     "docs/specs/core/cli-github/design.md",
     "docs/specs/core/cli-github/requirements.md",
@@ -19,13 +19,20 @@
       "context": "/86/aff6785f97/0/context.md",
       "content_hash": "/86/aff6785f97/0/content_hash.txt",
       "prompt": "/86/aff6785f97/0/prompt.txt"
+    },
+    {
+      "metadata": "/86/aff6785f97/1/metadata.json",
+      "transcript": "/86/aff6785f97/1/full.jsonl",
+      "context": "/86/aff6785f97/1/context.md",
+      "content_hash": "/86/aff6785f97/1/content_hash.txt",
+      "prompt": "/86/aff6785f97/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 177,
-    "cache_creation_tokens": 190357,
-    "cache_read_tokens": 2875304,
-    "output_tokens": 2474,
-    "api_call_count": 53
+    "input_tokens": 2341,
+    "cache_creation_tokens": 831281,
+    "cache_read_tokens": 23377236,
+    "output_tokens": 33407,
+    "api_call_count": 270
   }
 }
