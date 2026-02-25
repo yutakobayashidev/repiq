@@ -34,11 +34,12 @@
 
 ```
 NPMMetrics {
-  weekly_downloads  int
-  latest_version    string
-  last_publish_days int
+  weekly_downloads   int
+  monthly_downloads  int
+  latest_version     string
+  last_publish_days  int
   dependencies_count int
-  license           string
+  license            string
 }
 ```
 
@@ -51,10 +52,12 @@ NPMMetrics {
 | 1 | `GET /{package}/latest` | version, dependencies, license | registry.npmjs.org |
 | 2 | `GET /{package}` (abbreviated) | modified (last_publish_days 計算用) | registry.npmjs.org |
 | 3 | `GET /downloads/point/last-week/{package}` | weekly_downloads | api.npmjs.org |
+| 4 | `GET /downloads/point/last-month/{package}` | monthly_downloads | api.npmjs.org |
 
 - エンドポイント 2 は `Accept: application/vnd.npm.install-v1+json` ヘッダーで abbreviated metadata を取得
 - scoped package は downloads API で `@scope%2Fname` にエンコード
-- 3 リクエストを goroutine で並列実行
+- エンドポイント 3 と 4 は同一レスポンス形式 (`{downloads: int}`)、共通の `fetchDownloads(ctx, pkg, period)` で実装
+- 4 リクエストを goroutine で並列実行
 
 ### 処理フロー
 
@@ -65,8 +68,10 @@ Fetch(ctx, identifier)
   │     → latest_version, dependencies_count, license
   ├── goroutine 2: GET /{pkg} (abbreviated)
   │     → modified → last_publish_days 計算
-  └── goroutine 3: GET /downloads/point/last-week/{pkg}
-        → weekly_downloads
+  ├── goroutine 3: GET /downloads/point/last-week/{pkg}
+  │     → weekly_downloads
+  └── goroutine 4: GET /downloads/point/last-month/{pkg}
+        → monthly_downloads
   ├── sync.WaitGroup.Wait()
   └── return Result{Target: "npm:{identifier}", NPM: &NPMMetrics{...}}
 ```
@@ -87,6 +92,7 @@ Fetch(ctx, identifier)
   "target": "npm:react",
   "npm": {
     "weekly_downloads": 25000000,
+    "monthly_downloads": 100000000,
     "latest_version": "19.1.0",
     "last_publish_days": 15,
     "dependencies_count": 2,
@@ -130,9 +136,9 @@ npm 結果を GitHub とは別テーブルにレンダリング:
 
 ## npm
 
-| target | weekly_downloads | latest_version | last_publish_days | dependencies_count | license |
-|--------|-----------------|----------------|-------------------|-------------------|---------|
-| npm:react | 25000000 | 19.1.0 | 15 | 2 | MIT |
+| target | weekly_downloads | monthly_downloads | latest_version | last_publish_days | dependencies_count | license |
+|--------|-----------------|-------------------|----------------|-------------------|-------------------|---------|
+| npm:react | 25000000 | 100000000 | 19.1.0 | 15 | 2 | MIT |
 ```
 
 ## Tracking

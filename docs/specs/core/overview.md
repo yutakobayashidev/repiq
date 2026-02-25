@@ -23,7 +23,7 @@ repiq は AI エージェント向けの OSS データ取得 CLI だが、現在
 
 ## Expected Outcome
 
-- `repiq github:<owner>/<repo>` で stars, forks, contributors, open_issues, release_count, last_commit_days, commits_30d, issues_closed_30d が取得できる
+- `repiq github:<owner>/<repo>` で stars, forks, contributors, open_issues, release_count, last_commit_days, commits_30d, issues_closed_30d, license が取得できる
 - `--json`, `--ndjson`, `--markdown` の 3 フォーマットで出力できる
 - 複数ターゲットを goroutine で並列取得できる (異なるスキームの混在も許容)
 - `--markdown` は異なるスキーム混在時にスキーム別テーブルで出力 (kubectl 方式)

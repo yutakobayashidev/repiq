@@ -29,7 +29,7 @@ repiq の全コードを新規作成する。以下の 4 レイヤーで構成:
 - google/go-github クライアントを使用
 - 認証トークン解決: `gh auth token` (exec) → `GITHUB_TOKEN` (env) → 未認証
 - 取得データ:
-  - `GET /repos/{owner}/{repo}` → stars, forks, open_issues
+  - `GET /repos/{owner}/{repo}` → stars, forks, open_issues, license
   - `GET /repos/{owner}/{repo}/contributors?per_page=1` → Link ヘッダーから contributors 推定
   - `GET /repos/{owner}/{repo}/releases?per_page=1` → Link ヘッダーから release_count 推定
   - `GET /repos/{owner}/{repo}/commits?per_page=1` → 最新コミット日時から last_commit_days 算出
@@ -57,7 +57,8 @@ repiq の全コードを新規作成する。以下の 4 レイヤーで構成:
     "release_count": 210,
     "last_commit_days": 2,
     "commits_30d": 120,
-    "issues_closed_30d": 340
+    "issues_closed_30d": 340,
+    "license": "MIT"
   }
 }
 ```
@@ -74,9 +75,9 @@ repiq の全コードを新規作成する。以下の 4 レイヤーで構成:
 ### Markdown 出力
 
 ```
-| target | stars | forks | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d |
-|--------|-------|-------|-------------|--------------|---------------|------------------|-------------|--------------------|
-| github:facebook/react | 215000 | 45000 | 980 | 1623 | 210 | 2 | 120 | 340 |
+| target | stars | forks | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d | license |
+|--------|-------|-------|-------------|--------------|---------------|------------------|-------------|---------------------|---------|
+| github:facebook/react | 215000 | 45000 | 980 | 1623 | 210 | 2 | 120 | 340 | MIT |
 ```
 
 ## パッケージ構成

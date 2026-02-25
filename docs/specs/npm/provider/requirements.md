@@ -6,8 +6,9 @@
 
 - `npm:<package>` ターゲット形式をサポートする
 - scoped package (`npm:@types/node`, `npm:@babel/core`) をサポートする
-- 以下の 5 メトリクスを取得・返却する:
+- 以下の 6 メトリクスを取得・返却する:
   - `weekly_downloads` (int) — 過去 7 日間のダウンロード数
+  - `monthly_downloads` (int) — 過去 30 日間のダウンロード数 (`/downloads/point/last-month` エンドポイント)
   - `latest_version` (string) — 最新バージョン文字列
   - `last_publish_days` (int) — 最終パブリッシュからの経過日数
   - `dependencies_count` (int) — latest バージョンの依存パッケージ数

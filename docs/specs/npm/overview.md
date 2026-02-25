@@ -11,6 +11,7 @@ repiq の core epic で GitHub プロバイダーと Provider インターフェ
 具体的には:
 
 - **利用実態が見えない**: スター数が多くても実際に使われているかは分からない。npm の weekly downloads は実利用の直接的な指標になる
+- **ダウンロードトレンドが不明**: weekly downloads 単体では新興ライブラリの勢いを評価できない。monthly downloads を併せて提供することで `weekly * 4 / monthly` による加速/減速の推定が可能になる
 - **メンテナンス状況の別視点**: GitHub の last_commit_days はコード変更の頻度を示すが、last_publish_days はリリースの頻度を示す。両方あって初めてメンテナンス状況を正確に把握できる
 - **依存関係の複雑さ**: dependencies_count はサプライチェーンリスクの簡易指標として機能する
 
@@ -24,7 +25,7 @@ repiq の core epic で GitHub プロバイダーと Provider インターフェ
 
 ## Hypothesis
 
-- **仮説 1 (AI 判断材料の充実)**: GitHub メトリクスに npm メトリクス (weekly_downloads, last_publish_days 等) を加えることで、AI エージェントがライブラリの実利用状況とメンテナンス状況をより正確に評価でき、選定精度が向上する
+- **仮説 1 (AI 判断材料の充実)**: GitHub メトリクスに npm メトリクス (weekly_downloads, monthly_downloads, last_publish_days 等) を加えることで、AI エージェントがライブラリの実利用状況・トレンド・メンテナンス状況をより正確に評価でき、選定精度が向上する
 - **仮説 2 (プロバイダー拡張性の検証)**: 既存の Provider インターフェースが2つ目のプロバイダー (npm) でも変更なしにスムーズに機能し、後続レジストリ追加の実用性が実証される
 
 ## Expected Outcome

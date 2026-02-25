@@ -14,6 +14,7 @@
   - `last_commit_days` — 最終コミットからの経過日数
   - `commits_30d` — 直近 30 日のコミット数
   - `issues_closed_30d` — 直近 30 日にクローズされた Issue 数
+  - `license` — SPDX ライセンス識別子 (`GET /repos` レスポンスの `license.spdx_id` から抽出、追加 API コール不要)
 - 出力フォーマット:
   - `--markdown` (デフォルト): Markdown テーブル。スキーム混在時はスキーム別テーブル
   - `--json`: JSON 配列
