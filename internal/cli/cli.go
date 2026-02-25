@@ -14,8 +14,11 @@ import (
 	"github.com/yutakobayashidev/repiq/internal/cache"
 	"github.com/yutakobayashidev/repiq/internal/format"
 	"github.com/yutakobayashidev/repiq/internal/provider"
+	cratesprovider "github.com/yutakobayashidev/repiq/internal/provider/crates"
 	ghprovider "github.com/yutakobayashidev/repiq/internal/provider/github"
+	golangprovider "github.com/yutakobayashidev/repiq/internal/provider/golang"
 	npmprovider "github.com/yutakobayashidev/repiq/internal/provider/npm"
+	pypiprovider "github.com/yutakobayashidev/repiq/internal/provider/pypi"
 )
 
 // Version is set at build time via ldflags.
@@ -42,7 +45,10 @@ Fetch objective metrics for OSS libraries and repositories.
 Examples:
   repiq github:facebook/react
   repiq npm:react
-  repiq --ndjson github:facebook/react npm:react
+  repiq pypi:requests
+  repiq crates:serde
+  repiq go:golang.org/x/text
+  repiq --ndjson github:facebook/react npm:react pypi:flask
   repiq --markdown github:golang/go
 
 Flags:
@@ -90,15 +96,24 @@ Flags:
 
 	ghProvider := provider.Provider(ghprovider.New(token, ""))
 	npmProvider := provider.Provider(npmprovider.New("", ""))
+	pypiProvider := provider.Provider(pypiprovider.New("", ""))
+	cratesProvider := provider.Provider(cratesprovider.New(""))
+	goProvider := provider.Provider(golangprovider.New("", ""))
 
 	if cacheDir, err := os.UserCacheDir(); err == nil {
 		store := cache.NewStore(filepath.Join(cacheDir, "repiq"), 24*time.Hour)
 		ghProvider = cache.NewProvider(ghProvider, store, *noCacheFlag)
 		npmProvider = cache.NewProvider(npmProvider, store, *noCacheFlag)
+		pypiProvider = cache.NewProvider(pypiProvider, store, *noCacheFlag)
+		cratesProvider = cache.NewProvider(cratesProvider, store, *noCacheFlag)
+		goProvider = cache.NewProvider(goProvider, store, *noCacheFlag)
 	}
 
 	registry.Register(ghProvider)
 	registry.Register(npmProvider)
+	registry.Register(pypiProvider)
+	registry.Register(cratesProvider)
+	registry.Register(goProvider)
 
 	// Parse and validate all targets first.
 	parsed := make([]provider.Target, len(targets))
