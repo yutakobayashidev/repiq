@@ -14,7 +14,7 @@ import (
 	"github.com/yutakobayashidev/repiq/internal/provider"
 )
 
-var validCrateRe = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
+var validCrateRe = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]*$`)
 
 const defaultBaseURL = "https://crates.io"
 

@@ -160,7 +160,7 @@ type versionInfoResponse struct {
 
 func (p *Provider) fetchLicense(ctx context.Context, module, version string) (string, error) {
 	encoded := url.PathEscape(module)
-	u := fmt.Sprintf("%s/v3alpha/systems/go/packages/%s/versions/%s", p.depsdevURL, encoded, version)
+	u := fmt.Sprintf("%s/v3alpha/systems/go/packages/%s/versions/%s", p.depsdevURL, encoded, url.PathEscape(version))
 
 	req, err := http.NewRequestWithContext(ctx, "GET", u, nil)
 	if err != nil {
@@ -197,7 +197,7 @@ type dependenciesResponse struct {
 
 func (p *Provider) fetchDependenciesCount(ctx context.Context, module, version string) (int, error) {
 	encoded := url.PathEscape(module)
-	u := fmt.Sprintf("%s/v3alpha/systems/go/packages/%s/versions/%s:dependencies", p.depsdevURL, encoded, version)
+	u := fmt.Sprintf("%s/v3alpha/systems/go/packages/%s/versions/%s:dependencies", p.depsdevURL, encoded, url.PathEscape(version))
 
 	req, err := http.NewRequestWithContext(ctx, "GET", u, nil)
 	if err != nil {
