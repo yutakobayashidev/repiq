@@ -31,9 +31,9 @@ func Run(args []string, stdout, stderr io.Writer) error {
 	fs := flag.NewFlagSet("repiq", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 
-	jsonFlag := fs.Bool("json", false, "output as JSON array (default)")
+	jsonFlag := fs.Bool("json", false, "output as JSON array")
 	ndjsonFlag := fs.Bool("ndjson", false, "output as newline-delimited JSON")
-	markdownFlag := fs.Bool("markdown", false, "output as Markdown table")
+	markdownFlag := fs.Bool("markdown", false, "output as Markdown table (default)")
 	versionFlag := fs.Bool("version", false, "print version and exit")
 	noCacheFlag := fs.Bool("no-cache", false, "bypass cache and always fetch from API")
 
@@ -48,8 +48,8 @@ Examples:
   repiq pypi:requests
   repiq crates:serde
   repiq go:golang.org/x/text
+  repiq --json github:facebook/react
   repiq --ndjson github:facebook/react npm:react pypi:flask
-  repiq --markdown github:golang/go
 
 Flags:
 `)
@@ -72,17 +72,17 @@ Flags:
 	}
 
 	// Determine output format. When multiple flags are set, priority:
-	// markdown > ndjson > json (default). This matches the spec's
+	// json > ndjson > markdown (default). This matches the spec's
 	// "last specified wins" intent for wrapper scripts that set defaults.
-	formatter := format.JSON
+	formatter := format.Markdown
 	if *ndjsonFlag {
 		formatter = format.NDJSON
 	}
-	if *markdownFlag {
-		formatter = format.Markdown
-	}
-	if *jsonFlag && !*ndjsonFlag && !*markdownFlag {
+	if *jsonFlag {
 		formatter = format.JSON
+	}
+	if *markdownFlag && !*jsonFlag && !*ndjsonFlag {
+		formatter = format.Markdown
 	}
 
 	// Set up providers.

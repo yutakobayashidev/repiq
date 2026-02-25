@@ -91,12 +91,34 @@ JSON key: `go`
 
 ## Output Formats
 
-### JSON (default)
+### Markdown (default)
+
+Provider-grouped tables.
+
+```bash
+repiq github:facebook/react npm:react
+```
+
+```markdown
+## GitHub
+
+| Target | Stars | Forks | Open Issues | Contributors | Releases | Last Commit (days) | Commits (30d) | Issues Closed (30d) |
+|--------|-------|-------|-------------|--------------|----------|--------------------|---------------|---------------------|
+| github:facebook/react | 234000 | 47000 | 1000 | 1700 | 220 | 0 | 80 | 150 |
+
+## npm
+
+| Target | Weekly Downloads | Latest Version | Last Publish (days) | Dependencies | License |
+|--------|-----------------|----------------|---------------------|--------------|---------|
+| npm:react | 28000000 | 19.1.0 | 10 | 0 | MIT |
+```
+
+### JSON (`--json`)
 
 Single JSON array. Each element is a Result object.
 
 ```bash
-repiq github:facebook/react npm:react
+repiq --json github:facebook/react npm:react
 ```
 
 ```json
@@ -138,24 +160,6 @@ repiq --ndjson github:facebook/react npm:react
 ```
 {"target":"github:facebook/react","github":{"stars":234000,...}}
 {"target":"npm:react","npm":{"weekly_downloads":28000000,...}}
-```
-
-### Markdown (`--markdown`)
-
-Provider-grouped tables.
-
-```bash
-repiq --markdown github:facebook/react npm:react
-```
-
-```markdown
-| target | stars | forks | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| github:facebook/react | 234000 | 47000 | 1000 | 1700 | 220 | 0 | 80 | 150 |
-
-| target | weekly_downloads | latest_version | last_publish_days | dependencies_count | license |
-| --- | --- | --- | --- | --- | --- |
-| npm:react | 28000000 | 19.1.0 | 10 | 0 | MIT |
 ```
 
 ## Error Handling

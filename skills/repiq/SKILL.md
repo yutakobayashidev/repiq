@@ -4,7 +4,7 @@ description: >-
   Fetch objective metrics for OSS repositories and packages.
   Use when evaluating, comparing, or selecting libraries and repositories.
   Supports GitHub repos, npm/PyPI/crates.io packages, and Go modules.
-  Returns stars, downloads, contributors, release activity, and more as structured JSON.
+  Returns stars, downloads, contributors, release activity, and more as Markdown tables (or JSON with --json).
   No judgments, no recommendations, no scores — just numbers.
 license: MIT
 compatibility: Requires repiq CLI installed in PATH. Install via `go install` or Nix flake.
@@ -29,10 +29,13 @@ repiq github:facebook/react
 repiq npm:react
 
 # Compare multiple targets across providers
-repiq --json github:facebook/react npm:react pypi:flask crates:serde go:golang.org/x/net
+repiq github:facebook/react npm:react pypi:flask crates:serde go:golang.org/x/net
+
+# Output as JSON for programmatic use
+repiq --json github:facebook/react npm:react
 ```
 
-Output is JSON by default. Each target returns a structured result with provider-specific metrics.
+Output is Markdown tables by default, grouped by provider. Use `--json` for structured data.
 
 ## Supported Schemes
 
@@ -50,9 +53,9 @@ Multiple targets can be passed in a single command. They are fetched in parallel
 
 | Flag | Description |
 |------|-------------|
-| `--json` | Output as JSON array (default) |
+| `--markdown` | Output as Markdown tables grouped by provider (default) |
+| `--json` | Output as JSON array |
 | `--ndjson` | Output as newline-delimited JSON (one object per line) |
-| `--markdown` | Output as Markdown tables (grouped by provider) |
 | `--no-cache` | Bypass 24-hour disk cache and always fetch from API |
 | `--version` | Print version and exit |
 
@@ -75,7 +78,7 @@ For full field descriptions and types, see [references/REFERENCE.md](./reference
 ### Compare libraries for the same task
 
 ```bash
-repiq --json github:expressjs/express github:fastify/fastify npm:express npm:fastify
+repiq github:expressjs/express github:fastify/fastify npm:express npm:fastify
 ```
 
 Compare `stars`, `commits_30d`, `weekly_downloads`, and `last_publish_days` to assess activity and adoption.

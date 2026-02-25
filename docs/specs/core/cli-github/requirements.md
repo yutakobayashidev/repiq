@@ -15,9 +15,9 @@
   - `commits_30d` — 直近 30 日のコミット数
   - `issues_closed_30d` — 直近 30 日にクローズされた Issue 数
 - 出力フォーマット:
-  - `--json` (デフォルト): JSON 配列
+  - `--markdown` (デフォルト): Markdown テーブル。スキーム混在時はスキーム別テーブル
+  - `--json`: JSON 配列
   - `--ndjson`: 1行1レコード (改行区切り JSON)
-  - `--markdown`: Markdown テーブル。スキーム混在時はスキーム別テーブル
 - 複数ターゲットを引数に指定でき、並列で取得する
 - 未認証でも動作する (GitHub API 60 req/hour)
 - `gh auth token` があれば自動で認証モード (5,000 req/hour)

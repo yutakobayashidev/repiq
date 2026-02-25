@@ -12,7 +12,7 @@ repiq の全コードを新規作成する。以下の 4 レイヤーで構成:
 
 - エントリポイント: `main.go`
 - 引数パース: `<scheme>:<identifier>` を解析し、scheme と identifier に分離
-- フラグ: `--json` (default) / `--ndjson` / `--markdown` / `--help` / `--version`
+- フラグ: `--json` / `--ndjson` / `--markdown` (default) / `--help` / `--version`
 - 複数ターゲットを受け取り、Provider に渡して並列実行
 - 結果を指定フォーマットで stdout に出力。エラーは stderr
 

@@ -8,7 +8,7 @@
 - GitHub プロバイダー実装 (google/go-github クライアント)
   - stars, forks, last_commit_days, contributors, open_issues, release_count
   - commits_30d, issues_closed_30d
-- 出力フォーマッター: `--json` (デフォルト), `--ndjson`, `--markdown`
+- 出力フォーマッター: `--json`, `--ndjson`, `--markdown` (デフォルト)
 - `--markdown` は異なるスキームが混在する場合、スキームごとにテーブルを分離して出力 (kubectl 方式)
 - 複数ターゲットの goroutine 並列取得 (スキームの混在も制限なし)
 - GitHub 認証: 未認証でも動作 (60 req/hour)。`gh auth token` → `GITHUB_TOKEN` の順でトークンを探し、あれば rate limit 緩和 (5,000 req/hour)

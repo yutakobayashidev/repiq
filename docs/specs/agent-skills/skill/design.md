@@ -41,7 +41,7 @@ metadata:
 1. **Overview** — repiq の目的 (data only, no judgments)
 2. **Quick Start** — 基本的な呼び出し例
 3. **Schemes** — 5 スキームの形式と具体例
-4. **Flags** — `--json`, `--ndjson`, `--markdown`, `--no-cache`
+4. **Flags** — `--markdown` (default), `--json`, `--ndjson`, `--no-cache`
 5. **Use Cases** — ライブラリ比較、健全性評価のワークフロー例
 6. **Authentication** — GitHub token 設定方法
 7. **Installation** — `go install`, Nix による導入手順

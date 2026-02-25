@@ -12,7 +12,7 @@ You: "Add an HTTP client library"
 Agent: repiq npm:axios npm:ky npm:got → compares downloads, maintenance, dependencies → recommends with evidence
 ```
 
-repiq fetches stars, downloads, commit activity, and more from GitHub, npm, PyPI, crates.io, and Go Modules. It returns raw JSON -- no opinions, no scores. The agent reasons. You decide.
+repiq fetches stars, downloads, commit activity, and more from GitHub, npm, PyPI, crates.io, and Go Modules. It returns Markdown tables by default (or JSON with `--json`) -- no opinions, no scores. The agent reasons. You decide.
 
 ## Install
 
@@ -32,22 +32,12 @@ nix run github:yutakobayashidev/repiq
 repiq github:facebook/react
 ```
 
-```json
-[
-  {
-    "target": "github:facebook/react",
-    "github": {
-      "stars": 234000,
-      "forks": 47000,
-      "open_issues": 1000,
-      "contributors": 1700,
-      "release_count": 220,
-      "last_commit_days": 0,
-      "commits_30d": 80,
-      "issues_closed_30d": 150
-    }
-  }
-]
+```
+## GitHub
+
+| Target | Stars | Forks | Open Issues | Contributors | Releases | Last Commit (days) | Commits (30d) | Issues Closed (30d) |
+|--------|-------|-------|-------------|--------------|----------|--------------------|---------------|---------------------|
+| github:facebook/react | 234000 | 47000 | 1000 | 1700 | 220 | 0 | 80 | 150 |
 ```
 
 ## Use Cases
@@ -165,9 +155,9 @@ Compare equivalent packages across languages using downloads, dependency count, 
 
 | Flag | Format | Description |
 |------|--------|-------------|
-| `--json` | JSON | Single JSON array (default) |
+| _(none)_ | Markdown | Tables grouped by provider (default) |
+| `--json` | JSON | Single JSON array |
 | `--ndjson` | NDJSON | One JSON object per line |
-| `--markdown` | Markdown | Tables grouped by provider |
 
 ## Authentication
 

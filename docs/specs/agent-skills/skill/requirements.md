@@ -12,7 +12,7 @@
   - repiq の目的 (データのみ提供、判断はしない)
   - CLI の呼び出し形式: `repiq [flags] <scheme>:<identifier> [...]`
   - 全 5 スキームの形式と例: `github:owner/repo`, `npm:package`, `pypi:package`, `crates:crate`, `go:module/path`
-  - 出力フォーマットフラグ: `--json` (デフォルト), `--ndjson`, `--markdown`
+  - 出力フォーマットフラグ: `--markdown` (デフォルト), `--json`, `--ndjson`
   - `--no-cache` フラグの説明
   - 代表的なユースケース (ライブラリ比較、リポジトリ健全性評価)
 - `skills/repiq/references/REFERENCE.md` に以下を分離:

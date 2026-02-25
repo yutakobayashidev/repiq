@@ -44,8 +44,8 @@ MVP (Minimum Viable Product)
 
 ## Success Criteria
 
-- `repiq github:facebook/react` で GitHub メトリクスが JSON で返る
-- `repiq npm:react` で npm メトリクスが JSON で返る
+- `repiq github:facebook/react` で GitHub メトリクスが Markdown テーブルで返る
+- `repiq npm:react` で npm メトリクスが Markdown テーブルで返る
 - `repiq github:facebook/react npm:react` で複数ターゲット一括取得できる
 - `--ndjson` で 1行1レコード形式で出力できる
 - `--markdown` で人間が読める Markdown テーブルで出力できる
