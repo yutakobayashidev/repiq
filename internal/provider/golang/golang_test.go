@@ -39,25 +39,13 @@ func setupMockServers(t *testing.T) (proxy *httptest.Server, depsdev *httptest.S
 			"licenses": []string{"BSD-3-Clause"},
 		})
 	})
-	// GET /v3alpha/systems/go/packages/golang.org%2Fx%2Ftext/versions/v0.34.0:dependencies
-	depsdevMux.HandleFunc("GET /v3alpha/systems/go/packages/golang.org%2Fx%2Ftext/versions/v0.34.0:dependencies", func(w http.ResponseWriter, _ *http.Request) {
+	// GET /v3alpha/systems/go/packages/golang.org%2Fx%2Ftext/versions/v0.34.0:requirements
+	depsdevMux.HandleFunc("GET /v3alpha/systems/go/packages/golang.org%2Fx%2Ftext/versions/v0.34.0:requirements", func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{
-			"nodes": []map[string]any{
-				{
-					"versionKey": map[string]any{"system": "GO", "name": "golang.org/x/text", "version": "v0.34.0"},
-					"relation":   "SELF",
-				},
-				{
-					"versionKey": map[string]any{"system": "GO", "name": "golang.org/x/tools", "version": "v0.21.0"},
-					"relation":   "DIRECT",
-				},
-				{
-					"versionKey": map[string]any{"system": "GO", "name": "golang.org/x/mod", "version": "v0.17.0"},
-					"relation":   "DIRECT",
-				},
-				{
-					"versionKey": map[string]any{"system": "GO", "name": "golang.org/x/sync", "version": "v0.7.0"},
-					"relation":   "INDIRECT",
+			"go": map[string]any{
+				"directDependencies": []map[string]any{
+					{"name": "golang.org/x/tools", "requirement": "v0.21.0"},
+					{"name": "golang.org/x/mod", "requirement": "v0.17.0"},
 				},
 			},
 		})
@@ -219,14 +207,11 @@ func TestModulePathEscape(t *testing.T) {
 			"licenses": []string{"MIT"},
 		})
 	})
-	depsdevMux.HandleFunc(fmt.Sprintf("GET /v3alpha/systems/go/packages/%s/versions/v1.0.0:dependencies",
+	depsdevMux.HandleFunc(fmt.Sprintf("GET /v3alpha/systems/go/packages/%s/versions/v1.0.0:requirements",
 		"github.com%2FAzure%2Fazure-sdk"), func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{
-			"nodes": []map[string]any{
-				{
-					"versionKey": map[string]any{"system": "GO", "name": "github.com/Azure/azure-sdk", "version": "v1.0.0"},
-					"relation":   "SELF",
-				},
+			"go": map[string]any{
+				"directDependencies": []map[string]any{},
 			},
 		})
 	})
@@ -273,17 +258,12 @@ func TestMajorVersionSuffix(t *testing.T) {
 			"licenses": []string{"Apache-2.0"},
 		})
 	})
-	depsdevMux.HandleFunc(fmt.Sprintf("GET /v3alpha/systems/go/packages/%s/versions/v2.3.0:dependencies",
+	depsdevMux.HandleFunc(fmt.Sprintf("GET /v3alpha/systems/go/packages/%s/versions/v2.3.0:requirements",
 		"github.com%2Fowner%2Frepo%2Fv2"), func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{
-			"nodes": []map[string]any{
-				{
-					"versionKey": map[string]any{"system": "GO", "name": "github.com/owner/repo/v2", "version": "v2.3.0"},
-					"relation":   "SELF",
-				},
-				{
-					"versionKey": map[string]any{"system": "GO", "name": "github.com/other/dep", "version": "v1.0.0"},
-					"relation":   "DIRECT",
+			"go": map[string]any{
+				"directDependencies": []map[string]any{
+					{"name": "github.com/other/dep", "requirement": "v1.0.0"},
 				},
 			},
 		})

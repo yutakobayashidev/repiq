@@ -188,16 +188,18 @@ func (p *Provider) fetchLicense(ctx context.Context, module, version string) (st
 	return strings.Join(info.Licenses, " OR "), nil
 }
 
-// dependenciesResponse represents deps.dev dependencies response.
-type dependenciesResponse struct {
-	Nodes []struct {
-		Relation string `json:"relation"`
-	} `json:"nodes"`
+// requirementsResponse represents deps.dev :requirements response.
+type requirementsResponse struct {
+	Go struct {
+		DirectDependencies []struct {
+			Name string `json:"name"`
+		} `json:"directDependencies"`
+	} `json:"go"`
 }
 
 func (p *Provider) fetchDependenciesCount(ctx context.Context, module, version string) (int, error) {
 	encoded := url.PathEscape(module)
-	u := fmt.Sprintf("%s/v3alpha/systems/go/packages/%s/versions/%s:dependencies", p.depsdevURL, encoded, url.PathEscape(version))
+	u := fmt.Sprintf("%s/v3alpha/systems/go/packages/%s/versions/%s:requirements", p.depsdevURL, encoded, url.PathEscape(version))
 
 	req, err := http.NewRequestWithContext(ctx, "GET", u, nil)
 	if err != nil {
@@ -211,21 +213,15 @@ func (p *Provider) fetchDependenciesCount(ctx context.Context, module, version s
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("deps.dev dependencies: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
+		return 0, fmt.Errorf("deps.dev requirements: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 
-	var deps dependenciesResponse
-	if err := json.NewDecoder(resp.Body).Decode(&deps); err != nil {
+	var reqs requirementsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&reqs); err != nil {
 		return 0, fmt.Errorf("decoding response: %w", err)
 	}
 
-	count := 0
-	for _, n := range deps.Nodes {
-		if n.Relation == "DIRECT" {
-			count++
-		}
-	}
-	return count, nil
+	return len(reqs.Go.DirectDependencies), nil
 }
 
 // escapeModulePath escapes a Go module path for the Go Module Proxy.
