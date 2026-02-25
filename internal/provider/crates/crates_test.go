@@ -157,7 +157,6 @@ func TestFetchPartialFailure(t *testing.T) {
 
 	mux := http.NewServeMux()
 
-	// Metadata succeeds
 	mux.HandleFunc("GET /api/v1/crates/partial-crate", func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{
 			"crate": map[string]any{
@@ -176,12 +175,10 @@ func TestFetchPartialFailure(t *testing.T) {
 		})
 	})
 
-	// Dependencies endpoint returns 500
 	mux.HandleFunc("GET /api/v1/crates/partial-crate/0.5.0/dependencies", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
 
-	// Reverse dependencies endpoint returns 500
 	mux.HandleFunc("GET /api/v1/crates/partial-crate/reverse_dependencies", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
@@ -195,7 +192,7 @@ func TestFetchPartialFailure(t *testing.T) {
 		t.Fatalf("unexpected Go error: %v", err)
 	}
 
-	// Should have partial metrics from Phase 1
+	// Should have partial metrics
 	if result.Crates == nil {
 		t.Fatal("expected Crates metrics for partial failure")
 	}
@@ -209,7 +206,7 @@ func TestFetchPartialFailure(t *testing.T) {
 		t.Errorf("license: got %q, want %q", result.Crates.License, "MIT")
 	}
 
-	// Should also have error for the failed Phase 2
+	// Should also have error
 	if result.Error == "" {
 		t.Fatal("expected result.Error for partial failure")
 	}

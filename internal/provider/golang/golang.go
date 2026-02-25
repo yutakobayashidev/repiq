@@ -55,7 +55,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		}, nil
 	}
 
-	// Phase 1: Fetch latest version from Go Module Proxy.
 	proxyInfo, err := p.fetchLatest(ctx, identifier)
 	if err != nil {
 		return provider.Result{
@@ -74,7 +73,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		LastPublishDays: days,
 	}
 
-	// Phase 2: Fetch license and dependencies from deps.dev (parallel).
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	var errs []string
@@ -121,7 +119,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 	return result, nil
 }
 
-// proxyResponse represents the JSON response from the Go Module Proxy /@latest endpoint.
 type proxyResponse struct {
 	Version string    `json:"Version"`
 	Time    time.Time `json:"Time"`
@@ -153,7 +150,6 @@ func (p *Provider) fetchLatest(ctx context.Context, module string) (*proxyRespon
 	return &info, nil
 }
 
-// versionInfoResponse represents deps.dev version info.
 type versionInfoResponse struct {
 	Licenses []string `json:"licenses"`
 }
@@ -188,7 +184,6 @@ func (p *Provider) fetchLicense(ctx context.Context, module, version string) (st
 	return strings.Join(info.Licenses, " OR "), nil
 }
 
-// requirementsResponse represents deps.dev :requirements response.
 type requirementsResponse struct {
 	Go struct {
 		DirectDependencies []struct {

@@ -120,7 +120,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 	return result, nil
 }
 
-// pypiResponse represents the PyPI JSON API response.
 type pypiResponse struct {
 	Info     pypiInfo                       `json:"info"`
 	Releases map[string][]pypiReleaseFile   `json:"releases"`
@@ -180,7 +179,6 @@ func (p *Provider) fetchMetadata(ctx context.Context, pkg string) (*pypiResponse
 	return &data, nil
 }
 
-// statsResponse represents the pypistats.org recent downloads response.
 type statsResponse struct {
 	Data statsData `json:"data"`
 }

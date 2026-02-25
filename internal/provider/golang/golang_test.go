@@ -17,7 +17,6 @@ func mustEncode(w http.ResponseWriter, v any) {
 	}
 }
 
-// setupMockServers creates mock Go Module Proxy and deps.dev API servers.
 func setupMockServers(t *testing.T) (proxy *httptest.Server, depsdev *httptest.Server) {
 	t.Helper()
 
@@ -162,7 +161,7 @@ func TestFetchDepsDevFailure(t *testing.T) {
 		t.Fatalf("unexpected Go error: %v", err)
 	}
 
-	// Partial result: proxy data should be present
+	// Should have partial metrics
 	g := result.Go
 	if g == nil {
 		t.Fatal("expected Go metrics for partial failure (proxy succeeded)")
@@ -173,14 +172,13 @@ func TestFetchDepsDevFailure(t *testing.T) {
 	if g.LastPublishDays < 14 || g.LastPublishDays > 16 {
 		t.Errorf("last_publish_days: got %d, want ~15", g.LastPublishDays)
 	}
-	// Defaults when deps.dev fails
 	if g.DependenciesCount != 0 {
 		t.Errorf("dependencies_count: got %d, want 0 (deps.dev failed)", g.DependenciesCount)
 	}
 	if g.License != "" {
 		t.Errorf("license: got %q, want %q (deps.dev failed)", g.License, "")
 	}
-	// Should have error noting deps.dev failure
+	// Should also have error
 	if result.Error == "" {
 		t.Fatal("expected result.Error for deps.dev failure")
 	}

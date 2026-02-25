@@ -61,7 +61,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		}, nil
 	}
 
-	// Phase 1: fetch crate metadata
 	meta, err := p.fetchMetadata(ctx, identifier)
 	if err != nil {
 		return provider.Result{
@@ -81,7 +80,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		LatestVersion:   version,
 	}
 
-	// Find matching version for license and created_at
 	for _, v := range meta.versions {
 		if v.num == version {
 			metrics.License = v.license
@@ -97,7 +95,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		}
 	}
 
-	// Phase 2: parallel fetch deps + reverse deps
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	var errs []string
@@ -144,8 +141,6 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 	return result, nil
 }
 
-// --- internal types for parsed metadata ---
-
 type crateMetadata struct {
 	downloads        int
 	recentDownloads  int
@@ -159,8 +154,6 @@ type versionEntry struct {
 	license   string
 	createdAt string
 }
-
-// --- HTTP helpers ---
 
 func (p *Provider) fetchMetadata(ctx context.Context, crate string) (*crateMetadata, error) {
 	u := fmt.Sprintf("%s/api/v1/crates/%s", p.baseURL, crate)
