@@ -39,6 +39,24 @@
         go = final."go_1_${toString goVersion}";
       };
 
+      packages = forEachSupportedSystem (
+        { pkgs, ... }:
+        {
+          default = pkgs.buildGoModule {
+            pname = "repiq";
+            version = "dev";
+            src = ./.;
+            vendorHash = "sha256-U69tqE0QQC1kDVUa436bB2ElCIkooB7YRVtV2+EPILg=";
+            meta = {
+              description = "Fetch objective metrics for OSS repositories";
+              homepage = "https://github.com/yutakobayashidev/repiq";
+              license = pkgs.lib.licenses.mit;
+              mainProgram = "repiq";
+            };
+          };
+        }
+      );
+
       checks = forEachSupportedSystem (
         { pkgs, system }:
         {
