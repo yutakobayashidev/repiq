@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "78476213f6d7",
+  "session_id": "62367aca-7b96-4e51-9d5d-cb2b17f4c108",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-25T00:22:13.793037497Z",
+  "branch": "feat/10-disk-cache",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "internal/cache/provider.go",
+    "internal/cache/provider_test.go",
+    "internal/cache/store.go",
+    "internal/cache/store_test.go",
+    "internal/cli/cli.go",
+    "internal/cli/cli_test.go"
+  ],
+  "agent": "Claude Code",
+  "turn_id": "c1023333d5ea",
+  "transcript_identifier_at_start": "f1fbf71b-2b59-43a6-a295-9ade0cb064af",
+  "checkpoint_transcript_start": 1,
+  "transcript_lines_at_start": 1,
+  "token_usage": {
+    "input_tokens": 592,
+    "cache_creation_tokens": 312021,
+    "cache_read_tokens": 7854023,
+    "output_tokens": 19010,
+    "api_call_count": 122
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-25T00:22:13.489703695Z",
+    "agent_lines": 458,
+    "human_added": 2,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 460,
+    "agent_percentage": 99.56521739130434
+  },
+  "transcript_path": ".config/claude/projects/-home-yuta-ghq-github-com-yutakobayashidev-repiq/62367aca-7b96-4e51-9d5d-cb2b17f4c108.jsonl"
+}

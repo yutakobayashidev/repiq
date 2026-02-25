@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "78476213f6d7",
+  "strategy": "manual-commit",
+  "branch": "feat/10-disk-cache",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "internal/cache/provider.go",
+    "internal/cache/provider_test.go",
+    "internal/cache/store.go",
+    "internal/cache/store_test.go",
+    "internal/cli/cli.go",
+    "internal/cli/cli_test.go"
+  ],
+  "sessions": [
+    {
+      "metadata": "/78/476213f6d7/0/metadata.json",
+      "transcript": "/78/476213f6d7/0/full.jsonl",
+      "context": "/78/476213f6d7/0/context.md",
+      "content_hash": "/78/476213f6d7/0/content_hash.txt",
+      "prompt": "/78/476213f6d7/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 592,
+    "cache_creation_tokens": 312021,
+    "cache_read_tokens": 7854023,
+    "output_tokens": 19010,
+    "api_call_count": 122
+  }
+}
