@@ -39,6 +39,9 @@ func NDJSON(w io.Writer, results []provider.Result) error {
 func Markdown(w io.Writer, results []provider.Result) error {
 	var ghResults []provider.Result
 	var npmResults []provider.Result
+	var pypiResults []provider.Result
+	var cratesResults []provider.Result
+	var goResults []provider.Result
 	var errResults []provider.Result
 	for _, r := range results {
 		switch {
@@ -46,6 +49,12 @@ func Markdown(w io.Writer, results []provider.Result) error {
 			ghResults = append(ghResults, r)
 		case r.NPM != nil:
 			npmResults = append(npmResults, r)
+		case r.PyPI != nil:
+			pypiResults = append(pypiResults, r)
+		case r.Crates != nil:
+			cratesResults = append(cratesResults, r)
+		case r.Go != nil:
+			goResults = append(goResults, r)
 		default:
 			errResults = append(errResults, r)
 		}
@@ -101,6 +110,96 @@ func Markdown(w io.Writer, results []provider.Result) error {
 				strconv.Itoa(n.LastPublishDays),
 				strconv.Itoa(n.DependenciesCount),
 				escapeMarkdown(n.License),
+				escapeMarkdown(r.Error),
+			); err != nil {
+				return err
+			}
+		}
+		needSep = true
+	}
+
+	if len(pypiResults) > 0 {
+		if needSep {
+			if _, err := fmt.Fprintln(w); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprintln(w, "| target | weekly_downloads | monthly_downloads | latest_version | last_publish_days | dependencies_count | license | requires_python | error |"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|---|---|---|"); err != nil {
+			return err
+		}
+		for _, r := range pypiResults {
+			p := r.PyPI
+			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
+				escapeMarkdown(r.Target),
+				strconv.Itoa(p.WeeklyDownloads),
+				strconv.Itoa(p.MonthlyDownloads),
+				escapeMarkdown(p.LatestVersion),
+				strconv.Itoa(p.LastPublishDays),
+				strconv.Itoa(p.DependenciesCount),
+				escapeMarkdown(p.License),
+				escapeMarkdown(p.RequiresPython),
+				escapeMarkdown(r.Error),
+			); err != nil {
+				return err
+			}
+		}
+		needSep = true
+	}
+
+	if len(cratesResults) > 0 {
+		if needSep {
+			if _, err := fmt.Fprintln(w); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprintln(w, "| target | downloads | recent_downloads | latest_version | last_publish_days | dependencies_count | license | reverse_dependencies | error |"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|---|---|---|"); err != nil {
+			return err
+		}
+		for _, r := range cratesResults {
+			c := r.Crates
+			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
+				escapeMarkdown(r.Target),
+				strconv.Itoa(c.Downloads),
+				strconv.Itoa(c.RecentDownloads),
+				escapeMarkdown(c.LatestVersion),
+				strconv.Itoa(c.LastPublishDays),
+				strconv.Itoa(c.DependenciesCount),
+				escapeMarkdown(c.License),
+				strconv.Itoa(c.ReverseDependencies),
+				escapeMarkdown(r.Error),
+			); err != nil {
+				return err
+			}
+		}
+		needSep = true
+	}
+
+	if len(goResults) > 0 {
+		if needSep {
+			if _, err := fmt.Fprintln(w); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprintln(w, "| target | latest_version | last_publish_days | dependencies_count | license | error |"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|"); err != nil {
+			return err
+		}
+		for _, r := range goResults {
+			g := r.Go
+			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s |\n",
+				escapeMarkdown(r.Target),
+				escapeMarkdown(g.LatestVersion),
+				strconv.Itoa(g.LastPublishDays),
+				strconv.Itoa(g.DependenciesCount),
+				escapeMarkdown(g.License),
 				escapeMarkdown(r.Error),
 			); err != nil {
 				return err
