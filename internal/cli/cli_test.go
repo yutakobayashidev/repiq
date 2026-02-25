@@ -63,6 +63,19 @@ func TestRunMultipleTargets(t *testing.T) {
 	}
 }
 
+func TestRunNoCacheFlag(t *testing.T) {
+	// --no-cache should be accepted without error.
+	// It will fail on fetch (unknown scheme), but flag parsing must succeed.
+	var stdout, stderr bytes.Buffer
+	err := Run([]string{"--no-cache", "unknown:x"}, &stdout, &stderr)
+	if err == nil {
+		t.Fatal("expected error (unknown scheme), but not a flag error")
+	}
+	if strings.Contains(err.Error(), "no-cache") {
+		t.Errorf("--no-cache should be a valid flag, got: %v", err)
+	}
+}
+
 func TestRunMultipleFormatFlagsNoError(t *testing.T) {
 	// Per spec Edge Case 9: multiple format flags use priority (markdown > ndjson > json).
 	// This should NOT return an error for the flags themselves.
