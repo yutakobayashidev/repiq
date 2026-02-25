@@ -1,0 +1,35 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "f7b72e2d874f",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "docs/specs/agent-skills/skill/design.md",
+    "docs/specs/agent-skills/skill/requirements.md",
+    "docs/specs/core/cli-github/design.md",
+    "docs/specs/core/cli-github/requirements.md",
+    "docs/specs/core/scope.md",
+    "docs/specs/scope.md",
+    "internal/cli/cli.go",
+    "skills/repiq/SKILL.md",
+    "skills/repiq/references/REFERENCE.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/f7/b72e2d874f/0/metadata.json",
+      "transcript": "/f7/b72e2d874f/0/full.jsonl",
+      "context": "/f7/b72e2d874f/0/context.md",
+      "content_hash": "/f7/b72e2d874f/0/content_hash.txt",
+      "prompt": "/f7/b72e2d874f/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 2164,
+    "cache_creation_tokens": 640924,
+    "cache_read_tokens": 20501932,
+    "output_tokens": 30933,
+    "api_call_count": 217
+  }
+}
