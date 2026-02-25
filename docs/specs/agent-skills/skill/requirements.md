@@ -47,7 +47,7 @@
 1. repiq が PATH に存在しない場合 → SKILL.md にインストール方法 (`go install` / Nix) を記載し、エージェントがユーザーに案内できるようにする
 2. GitHub 認証なしで実行した場合 → SKILL.md に rate limit の注意と `gh auth login` / `GITHUB_TOKEN` 設定を記載
 3. 存在しないパッケージ・リポジトリを指定した場合 → JSON 出力の `error` フィールドの解釈方法を REFERENCE.md に記載
-4. 複数ターゲット混在時 (github + npm + pypi) → 並列取得されること、結果が配列で返ることを明記
+4. 複数ターゲット混在時 (github + npm + pypi) → 並列取得されること、出力形式がフォーマットにより異なることを明記 (`--json`: JSON 配列、`--ndjson`: 1行1オブジェクト、`--markdown`: プロバイダー別テーブル)
 
 ## Constraints
 
