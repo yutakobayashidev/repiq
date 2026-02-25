@@ -93,22 +93,23 @@ repiq [--fields field1,field2,...] [--json|--ndjson] target...
 **Markdown:**
 
 ```
-| target | stars | license |
-|---|---|---|
-| github:facebook/react | 215000 | MIT |
+| target | stars | license | error |
+|---|---|---|---|
+| github:facebook/react | 215000 | MIT |  |
 
-| target | license |
-|---|---|
-| npm:react | MIT |
+| target | license | error |
+|---|---|---|
+| npm:react | MIT |  |
 ```
 
 ### `repiq --fields stars npm:react` (npm に stars はない)
 
+npm に `stars` フィールドは存在しないため、該当フィールドなし。プロバイダーオブジェクト自体を除外する:
+
 ```json
 [
   {
-    "target": "npm:react",
-    "npm": {}
+    "target": "npm:react"
   }
 ]
 ```
