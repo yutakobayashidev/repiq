@@ -109,6 +109,8 @@ repiq npm:zod pypi:pydantic crates:serde
 | crates.io | `crates:<crate>` | `crates:serde` |
 | Go Modules | `go:<module>` | `go:golang.org/x/text` |
 
+Want to add a new provider? See [Adding a Provider](docs/adding-a-provider.md) and [Contributing Guide](CONTRIBUTING.md).
+
 ## Metrics
 
 <details>
