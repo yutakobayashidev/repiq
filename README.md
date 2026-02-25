@@ -133,6 +133,16 @@ repiq is available as an [Agent Skill](https://agentskills.io/) for AI coding ag
 npx skills add github:yutakobayashidev/repiq
 ```
 
+With [agent-skills-nix](https://github.com/Kyure-A/agent-skills-nix):
+
+```nix
+sources.repiq = {
+  github = { owner = "yutakobayashidev"; repo = "repiq"; };
+};
+skills.enable = [ "repiq" ];
+targets.claude.enable = true;
+```
+
 ## Development
 
 ```bash
