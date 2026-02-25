@@ -17,7 +17,7 @@ Parallel: #1/#2 (別ファイル、依存なし)
 
 ## Tasks
 
-- [ ] #1 Create REFERENCE.md (詳細出力スキーマ)
+- [x] #1 Create REFERENCE.md (詳細出力スキーマ)
   What: 5 プロバイダーの全メトリクスフィールドを Markdown テーブルで記載
   Where: `skills/repiq/references/REFERENCE.md` (新規)
   How: `internal/provider/provider.go` の struct 定義から JSON タグ・型・説明を抽出してテーブル化
@@ -26,7 +26,7 @@ Parallel: #1/#2 (別ファイル、依存なし)
   Files: `skills/repiq/references/REFERENCE.md`
   Depends: (none)
 
-- [ ] #2 Create SKILL.md (メインスキルファイル)
+- [x] #2 Create SKILL.md (メインスキルファイル)
   What: Agent Skills 仕様準拠の SKILL.md を作成。frontmatter + 8 セクション (Overview, Quick Start, Schemes, Flags, Use Cases, Auth, Installation, Output Reference)
   Where: `skills/repiq/SKILL.md` (新規)
   How: design.md の frontmatter 定義に従い、`internal/cli/cli.go` のフラグ定義と `README.md` の使用例を参照して作成
@@ -35,7 +35,7 @@ Parallel: #1/#2 (別ファイル、依存なし)
   Files: `skills/repiq/SKILL.md`
   Depends: (none)
 
-- [ ] #3 Update README.md (Agent Skills セクション追加)
+- [x] #3 Update README.md (Agent Skills セクション追加)
   What: README.md の `## Output Formats` と `## Development` の間に `## Agent Skills` セクションを追加
   Where: `README.md` (既存ファイル編集)
   How: design.md の README 更新仕様に従い、インストールコマンドを記載
@@ -44,11 +44,12 @@ Parallel: #1/#2 (別ファイル、依存なし)
   Files: `README.md`
   Depends: #1, #2
 
-- [ ] #4 Validate SKILL.md (skills-ref バリデーション)
-  What: skills-ref validate を実行し、仕様準拠を確認
+- [x] #4 Validate SKILL.md (skills CLI バリデーション)
+  What: `npx skills add --list` でスキル検出を確認、`npx skills add` でインストール成功を確認
   Where: リポジトリルート
-  How: `npx skills-ref validate ./skills/repiq` または Python skills-ref CLI で実行
-  Why: Acceptance Gate: skills-ref validate 通過が必須条件
-  Verify: コマンドが exit 0 で終了し、エラーなし
+  How: `npx skills add ./skills/repiq --list` で frontmatter パース確認、`--agent claude-code` で実インストール確認
+  Why: Acceptance Gate: skills CLI でのインストール動作確認
+  Verify: `Found 1 skill` + `repiq` が検出され、Claude Code へのインストールが成功
   Files: (なし — 読み取りのみ)
   Depends: #1, #2
+  Note: skills-ref validate コマンドは存在しないため、skills add --list で代替検証
