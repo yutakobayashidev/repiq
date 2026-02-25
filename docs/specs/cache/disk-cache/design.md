@@ -36,6 +36,7 @@ cli.Run
 - **ファイル内容**:
   ```json
   {
+    "version": 2,
     "cached_at": "2026-02-25T09:00:00Z",
     "result": {
       "target": "github:facebook/react",
@@ -43,6 +44,7 @@ cli.Run
     }
   }
   ```
+- **スキーマバージョン判定**: `version` がコード側の `schemaVersion` 定数と一致しなければキャッシュミス。メトリクス構造体にフィールドが追加・削除・改名された場合、`schemaVersion` をインクリメントすることで古いキャッシュを自動無効化する
 - **TTL 判定**: `cached_at` + 24h > 現在時刻 → ヒット
 - **書き込み**: 一時ファイル (`*.tmp`) に書き込み後 `os.Rename` でアトミックに配置
 - **エラー結果の扱い**: `Result.Error` が空でない場合はキャッシュに書き込まない
@@ -69,6 +71,7 @@ cli.Run
 4. 各プロバイダーを `cache.NewProvider(underlying, store, noCache)` でラップし Registry に登録
 5. 並列フェッチ時、`CachingProvider.Fetch()` が呼ばれる:
    - `noCache == false` の場合、ストアからキーで検索
+   - バージョン不一致 → キャッシュミスとして扱う
    - ヒット & TTL 内 → キャッシュの Result を返却
    - ミスまたは TTL 切れ → underlying.Fetch() を呼び出し
    - 結果に Error がなければストアに書き込み

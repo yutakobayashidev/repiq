@@ -11,8 +11,15 @@ import (
 	"github.com/yutakobayashidev/repiq/internal/provider"
 )
 
+// schemaVersion must be incremented whenever provider.Result or any
+// nested metrics struct changes (fields added, removed, or renamed).
+// A mismatch between the stored version and the current version causes
+// a cache miss, preventing stale zero-valued fields from being served.
+const schemaVersion = 2
+
 // entry is the on-disk JSON structure for a cache entry.
 type entry struct {
+	Version  int             `json:"version"`
 	CachedAt time.Time       `json:"cached_at"`
 	Result   provider.Result `json:"result"`
 }
@@ -46,6 +53,10 @@ func (s *Store) Get(key string) (provider.Result, bool) {
 		return provider.Result{}, false
 	}
 
+	if e.Version != schemaVersion {
+		return provider.Result{}, false
+	}
+
 	if time.Since(e.CachedAt) > s.ttl {
 		return provider.Result{}, false
 	}
@@ -61,6 +72,7 @@ func (s *Store) Set(key string, result provider.Result) error {
 	}
 
 	e := entry{
+		Version:  schemaVersion,
 		CachedAt: time.Now(),
 		Result:   result,
 	}

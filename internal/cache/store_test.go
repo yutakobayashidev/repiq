@@ -103,6 +103,36 @@ func TestStoreDirectoryAutoCreation(t *testing.T) {
 	}
 }
 
+func TestStoreVersionMismatch(t *testing.T) {
+	dir := t.TempDir()
+	store := NewStore(dir, 24*time.Hour)
+
+	result := provider.Result{
+		Target: "npm:react",
+		NPM:    &provider.NPMMetrics{WeeklyDownloads: 5000000},
+	}
+	if err := store.Set("npm:react", result); err != nil {
+		t.Fatalf("Set: %v", err)
+	}
+
+	// Tamper with the cached file: set version to 0 (simulates old schema)
+	key := "npm:react"
+	path := store.path(key)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile: %v", err)
+	}
+	tampered := []byte(`{"version":0,` + string(data[len(`{"version":2,`):]))
+	if err := os.WriteFile(path, tampered, 0o644); err != nil {
+		t.Fatalf("WriteFile: %v", err)
+	}
+
+	_, ok := store.Get(key)
+	if ok {
+		t.Fatal("expected cache miss for old schema version")
+	}
+}
+
 func TestStoreCollisionFreeKeys(t *testing.T) {
 	store := NewStore(t.TempDir(), 24*time.Hour)
 
