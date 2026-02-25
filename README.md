@@ -125,6 +125,24 @@ Other providers (npm, PyPI, crates.io, Go Modules) require no authentication.
 - `--ndjson` -- Newline-delimited JSON, one object per line
 - `--markdown` -- Markdown table
 
+## Agent Skills
+
+repiq is available as an [Agent Skill](https://agentskills.io/) for AI coding agents (Claude Code, Cursor, Windsurf, etc.).
+
+```bash
+npx skills add github:yutakobayashidev/repiq
+```
+
+With [agent-skills-nix](https://github.com/Kyure-A/agent-skills-nix):
+
+```nix
+sources.repiq = {
+  github = { owner = "yutakobayashidev"; repo = "repiq"; };
+};
+skills.enable = [ "repiq" ];
+targets.claude.enable = true;
+```
+
 ## Development
 
 ```bash
