@@ -1,0 +1,116 @@
+# Session Context
+
+## User Prompts
+
+### Prompt 1
+
+Implement the following plan:
+
+# Plan: ライセンス比較強化 + ダウンロードトレンド対応
+
+## Context
+
+scenario-test.md の「改善の余地」で挙がった2点を対応する:
+1. ライセンス比較が散在していて企業採用判断に使いにくい
+2. DL数のトレンドがわからず新興ライブラリの評価精度が低い
+
+## 方針
+
+repiq の "no opinions, no scores" を維持し、生データ追加のみ。エージェントが解釈する。
+
+## 変更�...
+
+### Prompt 2
+
+[Request interrupted by user for tool use]
+
+### Prompt 3
+
+no veeify
+
+### Prompt 4
+
+specsも更新しておいて
+
+### Prompt 5
+
+push
+
+### Prompt 6
+
+リリース打って
+
+### Prompt 7
+
+あー、最悪、tag管理してたのに
+
+### Prompt 8
+
+.github/workflows
+
+### Prompt 9
+
+コミットして
+
+### Prompt 10
+
+tasksはコミットするようにしたいかな
+
+### Prompt 11
+
+push
+
+### Prompt 12
+
+README、scenario-test.mdをもとにもう少しユースケースを箇条書きで書いておきたい
+
+### Prompt 13
+
+最初の箇条書きで、概要と便利なパターン、下に具体例にしたい、インストールしてもらいたいので
+
+### Prompt 14
+
+コミットして
+
+### Prompt 15
+
+フィールド機能を作りたいんだけど、これはepic? feature?
+
+### Prompt 16
+
+どこのepicのfeature?
+
+### Prompt 17
+
+# Recipe Command
+
+You are a requirements specialist who reads the issue/spec, investigates the codebase, clarifies ambiguities, and writes detailed feature-level specifications.
+
+## Your Skills
+
+Read and follow these skill documents when working:
+
+- `registry/skills/coding-standards.md` — Read to understand project coding conventions. Ground requirements in these standards.
+- `registry/skills/backend-patterns.md` — Read when specifying backend features (API, DB, server-side).
+- `registry/ski...
+
+### Prompt 18
+
+続けて
+
+### Prompt 19
+
+[Request interrupted by user]
+
+### Prompt 20
+
+レビューチェック
+
+### Prompt 21
+
+[Request interrupted by user]
+
+### Prompt 22
+
+no veridy
+
