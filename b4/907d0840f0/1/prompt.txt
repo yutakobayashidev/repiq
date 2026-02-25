@@ -1,0 +1,296 @@
+Implement the following plan:
+
+# Plan: ライセンス比較強化 + ダウンロードトレンド対応
+
+## Context
+
+scenario-test.md の「改善の余地」で挙がった2点を対応する:
+1. ライセンス比較が散在していて企業採用判断に使いにくい
+2. DL数のトレンドがわからず新興ライブラリの評価精度が低い
+
+## 方針
+
+repiq の "no opinions, no scores" を維持し、生データ追加のみ。エージェントが解釈する。
+
+## 変更内容
+
+### 1. GitHub provider に `license` フィールド追加
+
+既に `client.Repositories.Get()` で取得済みのデータから `License.SPDXID` を抽出するだけ。追加 API コール不要。
+
+- `internal/provider/provider.go` — `GitHubMetrics` に `License string` 追加
+- `internal/provider/github/github.go` — `repoInfo.GetLicense().GetSPDXID()` 抽出 (nil-safe)
+- `internal/provider/github/github_test.go` — mock に license 追加、アサーション追加
+- `internal/format/format.go` — GitHub テーブルに license 列追加
+- `README.md` — GitHub メトリクス (8 → 9)
+
+### 2. npm provider に `monthly_downloads` フィールド追加
+
+npm API は `/downloads/point/last-month/{package}` をサポートしており、`last-week` と同一レスポンス形式。PyPI と同等の粒度になる。
+
+- `internal/provider/provider.go` — `NPMMetrics` に `MonthlyDownloads int` 追加
+- `internal/provider/npm/npm.go` — `fetchMonthlyDownloads` メソッド追加 + jobs に並列実行追加
+- `internal/provider/npm/npm_test.go` — 全テストケースに monthly mock 追加
+- `internal/format/format.go` — npm テーブルに monthly_downloads 列追加
+- `README.md` — npm メトリクス (5 → 6)
+
+### トレンドの解釈
+
+npm と PyPI の両方が weekly + monthly を持つようになるため、エージェントは `weekly * 4 / monthly` で加速/減速を推定可能。crates.io は `recent_downloads` (90日) が既にある。
+
+## コミット戦略
+
+2コミットに分離:
+1. `feat(github): add license metric`
+2. `feat(npm): add monthly downloads metric`
+
+## 検証
+
+- `go test ./...` 全パス
+- `go run ./cmd/repiq github:facebook/react` で license 列が表示される
+- `go run ./cmd/repiq npm:react` で monthly_downloads 列が表示される
+- `golangci-lint run ./...` パス
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /home/yuta/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+no veeify
+
+---
+
+specsも更新しておいて
+
+---
+
+push
+
+---
+
+リリース打って
+
+---
+
+あー、最悪、tag管理してたのに
+
+---
+
+.github/workflows
+
+---
+
+コミットして
+
+---
+
+tasksはコミットするようにしたいかな
+
+---
+
+push
+
+---
+
+README、scenario-test.mdをもとにもう少しユースケースを箇条書きで書いておきたい
+
+---
+
+最初の箇条書きで、概要と便利なパターン、下に具体例にしたい、インストールしてもらいたいので
+
+---
+
+コミットして
+
+---
+
+フィールド機能を作りたいんだけど、これはepic? feature?
+
+---
+
+どこのepicのfeature?
+
+---
+
+# Recipe Command
+
+You are a requirements specialist who reads the issue/spec, investigates the codebase, clarifies ambiguities, and writes detailed feature-level specifications.
+
+## Your Skills
+
+Read and follow these skill documents when working:
+
+- `registry/skills/coding-standards.md` — Read to understand project coding conventions. Ground requirements in these standards.
+- `registry/skills/backend-patterns.md` — Read when specifying backend features (API, DB, server-side).
+- `registry/skills/frontend-patterns.md` — Read when specifying frontend features (React, Next.js, state).
+- `registry/skills/design-principles/skill.md` — Read when specifying UI features (design system, layout, components).
+
+## Input
+
+`フィールド選択` is either:
+
+- A GitHub Issue number (e.g., `#42`) — fetch with `gh issue view`
+- A feature description (e.g., `PDF export button`)
+
+## Workflow
+
+### Step 1: Read Context
+
+1. Read the epic spec under `docs/specs/<epic>/`
+2. If an issue number is provided, fetch it with `gh issue view`
+3. Identify what feature/component you are specifying
+
+### Step 2: Investigate Codebase
+
+1. Use Grep, Glob, Read to understand relevant code areas
+2. Identify existing patterns, data models, APIs
+3. Find code that will be affected by this feature
+
+### Step 3: Clarify Ambiguities
+
+Use AskUserQuestion iteratively:
+
+- 2-4 questions per round
+- Provide 2-4 concrete options per question
+- Focus on:
+  - Functional behavior (what happens when...)
+  - Edge cases (what if...)
+  - Non-functional requirements (performance, security)
+  - Integration points (how does this connect to...)
+
+### Step 4: Create Worktree & Write Feature Spec
+
+Create a docs-only worktree for this feature:
+
+```
+EnterWorktree({ name: "docs/<epic>-<feature>" })
+```
+
+Then inside the worktree, create `docs/specs/<epic>/<feature>/` with 2 files:
+
+#### requirements.md
+
+```markdown
+# Requirements: <Feature Name>
+
+## Functional Requirements
+
+### P1 (Must have)
+
+-
+
+### P2 (Should have)
+
+-
+
+### P3 (Nice to have)
+
+-
+
+## Non-Functional Requirements
+
+-
+
+## Edge Cases
+
+1.
+2.
+3.
+
+## Constraints
+
+-
+```
+
+#### design.md
+
+```markdown
+# Design: <Feature Name>
+
+## Current State
+
+<!-- What exists today -->
+
+## Proposed Changes
+
+<!-- What we're building / changing -->
+
+## Backend Spec
+
+<!-- API endpoints, data models, processing flow -->
+
+## Tracking
+
+| Event Name | Properties | Trigger Condition |
+| ---------- | ---------- | ----------------- |
+|            |            |                   |
+```
+
+### Step 5: User Confirmation
+
+Present generated files for review. Handle modifications if requested.
+
+### Step 6: Create Docs-Only PR
+
+Commit and push the spec documents:
+
+```bash
+git add docs/specs/<epic>/<feature>/requirements.md docs/specs/<epic>/<feature>/design.md
+git commit -m "docs: <epic>/<feature> スペック追加"
+git push -u origin HEAD
+```
+
+Create a PR for review:
+
+```bash
+gh pr create \
+  --title "docs: <feature> スペック" \
+  --label "docs" \
+  --body "$(cat <<'EOF'
+## 概要
+
+<!-- 1-2 sentence summary from requirements.md -->
+
+## スペック
+
+- `docs/specs/<epic>/<feature>/requirements.md`
+- `docs/specs/<epic>/<feature>/design.md`
+
+## レビュー観点
+
+- [ ] 要件は明確で検証可能か
+- [ ] 設計は既存パターンと整合しているか
+- [ ] エッジケースは網羅されているか
+EOF
+)"
+```
+
+Open in browser:
+
+```bash
+gh pr view --web
+```
+
+## Output
+
+- `docs/specs/<epic>/<feature>/requirements.md`
+- `docs/specs/<epic>/<feature>/design.md`
+
+## Rules
+
+- Always respond in the user's language
+- Always read existing code before asking questions
+- Keep questions grounded in what you found in the codebase
+- Do not prescribe implementation details in requirements — keep them behavior-focused
+- Design.md should describe WHAT changes, not HOW to code them
+- Limit each AskUserQuestion round to 2-4 questions
+
+## Next Step
+
+Run `/kitchen:prep` to create an implementation plan and decompose into TODO tasks.
