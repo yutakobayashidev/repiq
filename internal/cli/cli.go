@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/yutakobayashidev/repiq/internal/auth"
+	"github.com/yutakobayashidev/repiq/internal/cache"
 	"github.com/yutakobayashidev/repiq/internal/format"
 	"github.com/yutakobayashidev/repiq/internal/provider"
 	ghprovider "github.com/yutakobayashidev/repiq/internal/provider/github"
@@ -30,6 +32,7 @@ func Run(args []string, stdout, stderr io.Writer) error {
 	ndjsonFlag := fs.Bool("ndjson", false, "output as newline-delimited JSON")
 	markdownFlag := fs.Bool("markdown", false, "output as Markdown table")
 	versionFlag := fs.Bool("version", false, "print version and exit")
+	noCacheFlag := fs.Bool("no-cache", false, "bypass cache and always fetch from API")
 
 	fs.Usage = func() {
 		_, _ = io.WriteString(stderr, `Usage: repiq [flags] <scheme>:<identifier> [...]
@@ -84,8 +87,18 @@ Flags:
 	token := resolver.ResolveToken()
 
 	registry := provider.NewRegistry()
-	registry.Register(ghprovider.New(token, ""))
-	registry.Register(npmprovider.New("", ""))
+
+	ghProvider := provider.Provider(ghprovider.New(token, ""))
+	npmProvider := provider.Provider(npmprovider.New("", ""))
+
+	if cacheDir, err := os.UserCacheDir(); err == nil {
+		store := cache.NewStore(filepath.Join(cacheDir, "repiq"), 24*time.Hour)
+		ghProvider = cache.NewProvider(ghProvider, store, *noCacheFlag)
+		npmProvider = cache.NewProvider(npmProvider, store, *noCacheFlag)
+	}
+
+	registry.Register(ghProvider)
+	registry.Register(npmProvider)
 
 	// Parse and validate all targets first.
 	parsed := make([]provider.Target, len(targets))
