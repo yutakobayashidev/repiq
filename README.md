@@ -26,6 +26,24 @@ Or with Nix:
 nix run github:yutakobayashidev/repiq
 ```
 
+## Agent Skills
+
+repiq is available as an [Agent Skill](https://agentskills.io/) for AI coding agents (Claude Code, Cursor, Windsurf, etc.).
+
+```bash
+npx skills add github:yutakobayashidev/repiq
+```
+
+With [agent-skills-nix](https://github.com/Kyure-A/agent-skills-nix):
+
+```nix
+sources.repiq = {
+  github = { owner = "yutakobayashidev"; repo = "repiq"; };
+};
+skills.enable = [ "repiq" ];
+targets.claude.enable = true;
+```
+
 ## Quick Start
 
 ```bash
@@ -185,24 +203,6 @@ GitHub provider only. Token is resolved automatically:
 3. Unauthenticated (60 req/hour)
 
 Other providers require no authentication.
-
-## Agent Skills
-
-repiq is available as an [Agent Skill](https://agentskills.io/) for AI coding agents (Claude Code, Cursor, Windsurf, etc.).
-
-```bash
-npx skills add github:yutakobayashidev/repiq
-```
-
-With [agent-skills-nix](https://github.com/Kyure-A/agent-skills-nix):
-
-```nix
-sources.repiq = {
-  github = { owner = "yutakobayashidev"; repo = "repiq"; };
-};
-skills.enable = [ "repiq" ];
-targets.claude.enable = true;
-```
 
 ## Development
 
