@@ -1,0 +1,37 @@
+CLAUDE.mdからコミットメッセージの規約をはがして、dotnixのclaude/rulesのghqが私のアカウント名以下に適用するようにしてくれる？
+
+---
+
+[Request interrupted by user]
+
+---
+
+dotnix
+
+---
+
+いや別にシンボリックリンクなくても読み込まれるよ
+
+---
+
+[Request interrupted by user]
+
+---
+
+dotnix/claude/rulesの中に作れって言ってる、そこからは決して
+
+---
+
+toolchain-explainer.mdが過剰にWebSearchするので、基本ドメイン知識とrepiqから調べるように指示を変えて
+
+---
+
+コミットして
+
+---
+
+[Request interrupted by user]
+
+---
+
+no verify
