@@ -22,6 +22,7 @@ type Result struct {
 // NPMMetrics holds npm registry metrics.
 type NPMMetrics struct {
 	WeeklyDownloads   int    `json:"weekly_downloads"`
+	MonthlyDownloads  int    `json:"monthly_downloads"`
 	LatestVersion     string `json:"latest_version"`
 	LastPublishDays   int    `json:"last_publish_days"`
 	DependenciesCount int    `json:"dependencies_count"`
@@ -60,12 +61,13 @@ type GoMetrics struct {
 
 // GitHubMetrics holds GitHub-specific metrics.
 type GitHubMetrics struct {
-	Stars            int `json:"stars"`
-	Forks            int `json:"forks"`
-	OpenIssues       int `json:"open_issues"`
-	Contributors     int `json:"contributors"`
-	ReleaseCount     int `json:"release_count"`
-	LastCommitDays   int `json:"last_commit_days"`
-	Commits30d       int `json:"commits_30d"`
-	IssuesClosed30d  int `json:"issues_closed_30d"`
+	Stars            int    `json:"stars"`
+	Forks            int    `json:"forks"`
+	OpenIssues       int    `json:"open_issues"`
+	Contributors     int    `json:"contributors"`
+	ReleaseCount     int    `json:"release_count"`
+	LastCommitDays   int    `json:"last_commit_days"`
+	Commits30d       int    `json:"commits_30d"`
+	IssuesClosed30d  int    `json:"issues_closed_30d"`
+	License          string `json:"license"`
 }

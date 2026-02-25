@@ -97,6 +97,16 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 			mu.Unlock()
 			return nil
 		}},
+		{"monthly_downloads", func(ctx context.Context) error {
+			count, err := p.fetchMonthlyDownloads(ctx, identifier)
+			if err != nil {
+				return err
+			}
+			mu.Lock()
+			metrics.MonthlyDownloads = count
+			mu.Unlock()
+			return nil
+		}},
 	}
 
 	wg.Add(len(jobs))
@@ -220,14 +230,14 @@ func (p *Provider) fetchLastPublishDays(ctx context.Context, pkg string) (int, e
 	return days, nil
 }
 
-func (p *Provider) fetchWeeklyDownloads(ctx context.Context, pkg string) (int, error) {
+func (p *Provider) fetchDownloads(ctx context.Context, pkg, period string) (int, error) {
 	// For scoped packages (@scope/name), the npm downloads API requires
 	// the package name as a single path token with the slash encoded as %2F
 	// (e.g., @scope%2Fname). We use url.PathEscape on the full name to
 	// achieve this, since PathEscape encodes "/" to %2F.
 	encodedPkg := url.PathEscape(pkg)
 
-	u := fmt.Sprintf("%s/downloads/point/last-week/%s", p.downloadsURL, encodedPkg)
+	u := fmt.Sprintf("%s/downloads/point/%s/%s", p.downloadsURL, period, encodedPkg)
 	req, err := http.NewRequestWithContext(ctx, "GET", u, nil)
 	if err != nil {
 		return 0, err
@@ -250,4 +260,12 @@ func (p *Provider) fetchWeeklyDownloads(ctx context.Context, pkg string) (int, e
 		return 0, fmt.Errorf("decoding response: %w", err)
 	}
 	return dl.Downloads, nil
+}
+
+func (p *Provider) fetchWeeklyDownloads(ctx context.Context, pkg string) (int, error) {
+	return p.fetchDownloads(ctx, pkg, "last-week")
+}
+
+func (p *Provider) fetchMonthlyDownloads(ctx context.Context, pkg string) (int, error) {
+	return p.fetchDownloads(ctx, pkg, "last-month")
 }

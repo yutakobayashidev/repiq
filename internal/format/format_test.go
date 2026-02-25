@@ -28,6 +28,7 @@ func sampleResults() []provider.Result {
 			Target: "npm:react",
 			NPM: &provider.NPMMetrics{
 				WeeklyDownloads:   25000000,
+				MonthlyDownloads:  100000000,
 				LatestVersion:     "19.1.0",
 				LastPublishDays:   15,
 				DependenciesCount: 2,
@@ -115,6 +116,7 @@ func TestMarkdownNPM(t *testing.T) {
 			Target: "npm:react",
 			NPM: &provider.NPMMetrics{
 				WeeklyDownloads:   25000000,
+				MonthlyDownloads:  100000000,
 				LatestVersion:     "19.1.0",
 				LastPublishDays:   15,
 				DependenciesCount: 2,
@@ -130,11 +132,17 @@ func TestMarkdownNPM(t *testing.T) {
 	if !strings.Contains(output, "| weekly_downloads |") {
 		t.Error("expected npm table header with '| weekly_downloads |'")
 	}
+	if !strings.Contains(output, "| monthly_downloads |") {
+		t.Error("expected npm table header with '| monthly_downloads |'")
+	}
 	if !strings.Contains(output, "npm:react") {
 		t.Error("expected npm:react in output")
 	}
 	if !strings.Contains(output, "25000000") {
 		t.Error("expected weekly_downloads value in output")
+	}
+	if !strings.Contains(output, "100000000") {
+		t.Error("expected monthly_downloads value in output")
 	}
 	if !strings.Contains(output, "19.1.0") {
 		t.Error("expected latest_version in output")
@@ -291,6 +299,7 @@ func TestMarkdownMixed(t *testing.T) {
 			Target: "npm:react",
 			NPM: &provider.NPMMetrics{
 				WeeklyDownloads:   25000000,
+				MonthlyDownloads:  100000000,
 				LatestVersion:     "19.1.0",
 				LastPublishDays:   15,
 				DependenciesCount: 2,

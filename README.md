@@ -79,7 +79,7 @@ Compare equivalent packages across languages using downloads, dependency count, 
 ## Metrics
 
 <details>
-<summary><strong>GitHub</strong> (8 metrics)</summary>
+<summary><strong>GitHub</strong> (9 metrics)</summary>
 
 | Metric | Description |
 |--------|-------------|
@@ -91,15 +91,17 @@ Compare equivalent packages across languages using downloads, dependency count, 
 | `last_commit_days` | Days since last commit |
 | `commits_30d` | Commits in the last 30 days |
 | `issues_closed_30d` | Issues closed in the last 30 days |
+| `license` | SPDX license identifier (e.g. MIT, Apache-2.0) |
 
 </details>
 
 <details>
-<summary><strong>npm</strong> (5 metrics)</summary>
+<summary><strong>npm</strong> (6 metrics)</summary>
 
 | Metric | Description |
 |--------|-------------|
 | `weekly_downloads` | Downloads in the last 7 days |
+| `monthly_downloads` | Downloads in the last 30 days |
 | `latest_version` | Latest published version |
 | `last_publish_days` | Days since last publish |
 | `dependencies_count` | Number of runtime dependencies |

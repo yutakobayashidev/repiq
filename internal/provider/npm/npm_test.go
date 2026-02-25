@@ -56,6 +56,14 @@ func setupMockServers(t *testing.T) (registry *httptest.Server, downloads *httpt
 		})
 	})
 
+	// GET /downloads/point/last-month/react
+	dlMux.HandleFunc("GET /downloads/point/last-month/react", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{
+			"downloads": 100000000,
+			"package":   "react",
+		})
+	})
+
 	registry = httptest.NewServer(regMux)
 	downloads = httptest.NewServer(dlMux)
 	t.Cleanup(func() {
@@ -93,6 +101,9 @@ func TestFetchSuccess(t *testing.T) {
 	if n.WeeklyDownloads != 25000000 {
 		t.Errorf("weekly_downloads: got %d, want 25000000", n.WeeklyDownloads)
 	}
+	if n.MonthlyDownloads != 100000000 {
+		t.Errorf("monthly_downloads: got %d, want 100000000", n.MonthlyDownloads)
+	}
 	if n.LatestVersion != "19.1.0" {
 		t.Errorf("latest_version: got %q, want %q", n.LatestVersion, "19.1.0")
 	}
@@ -120,6 +131,9 @@ func TestFetchNotFound(t *testing.T) {
 
 	dlMux := http.NewServeMux()
 	dlMux.HandleFunc("GET /downloads/point/last-week/nonexistent-pkg", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	})
+	dlMux.HandleFunc("GET /downloads/point/last-month/nonexistent-pkg", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	})
 	dl := httptest.NewServer(dlMux)
@@ -177,6 +191,9 @@ func TestFetchScopedPackage(t *testing.T) {
 	dlMux.HandleFunc("GET /downloads/point/last-week/{pkg...}", func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{"downloads": 5000000})
 	})
+	dlMux.HandleFunc("GET /downloads/point/last-month/{pkg...}", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{"downloads": 20000000})
+	})
 	dl := httptest.NewServer(dlMux)
 	defer dl.Close()
 
@@ -219,6 +236,9 @@ func TestFetchLicenseObject(t *testing.T) {
 	dlMux.HandleFunc("GET /downloads/point/last-week/old-pkg", func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{"downloads": 100})
 	})
+	dlMux.HandleFunc("GET /downloads/point/last-month/old-pkg", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{"downloads": 400})
+	})
 	dl := httptest.NewServer(dlMux)
 	defer dl.Close()
 
@@ -255,6 +275,9 @@ func TestFetchNoDependencies(t *testing.T) {
 	dlMux.HandleFunc("GET /downloads/point/last-week/no-deps", func(w http.ResponseWriter, _ *http.Request) {
 		mustEncode(w, map[string]any{"downloads": 500})
 	})
+	dlMux.HandleFunc("GET /downloads/point/last-month/no-deps", func(w http.ResponseWriter, _ *http.Request) {
+		mustEncode(w, map[string]any{"downloads": 2000})
+	})
 	dl := httptest.NewServer(dlMux)
 	defer dl.Close()
 
@@ -290,6 +313,9 @@ func TestFetchPartialFailure(t *testing.T) {
 	// downloads API returns 500
 	dlMux := http.NewServeMux()
 	dlMux.HandleFunc("GET /downloads/point/last-week/partial", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	dlMux.HandleFunc("GET /downloads/point/last-month/partial", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
 	dl := httptest.NewServer(dlMux)

@@ -23,6 +23,11 @@ func setupMockServer(t *testing.T) *httptest.Server {
 			"stargazers_count":  1000,
 			"forks_count":      200,
 			"open_issues_count": 50,
+			"license": map[string]any{
+				"key":     "mit",
+				"spdx_id": "MIT",
+				"name":    "MIT License",
+			},
 		})
 	})
 
@@ -102,6 +107,9 @@ func TestFetchSuccess(t *testing.T) {
 	}
 	if g.IssuesClosed30d != 340 {
 		t.Errorf("issues_closed_30d: got %d, want 340", g.IssuesClosed30d)
+	}
+	if g.License != "MIT" {
+		t.Errorf("license: got %q, want %q", g.License, "MIT")
 	}
 }
 

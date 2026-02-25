@@ -63,15 +63,15 @@ func Markdown(w io.Writer, results []provider.Result) error {
 	needSep := false
 
 	if len(ghResults) > 0 {
-		if _, err := fmt.Fprintln(w, "| target | stars | forks | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d | error |"); err != nil {
+		if _, err := fmt.Fprintln(w, "| target | stars | forks | open_issues | contributors | release_count | last_commit_days | commits_30d | issues_closed_30d | license | error |"); err != nil {
 			return err
 		}
-		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|---|---|---|---|"); err != nil {
+		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|---|---|---|---|---|"); err != nil {
 			return err
 		}
 		for _, r := range ghResults {
 			g := r.GitHub
-			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
+			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
 				escapeMarkdown(r.Target),
 				strconv.Itoa(g.Stars),
 				strconv.Itoa(g.Forks),
@@ -81,6 +81,7 @@ func Markdown(w io.Writer, results []provider.Result) error {
 				strconv.Itoa(g.LastCommitDays),
 				strconv.Itoa(g.Commits30d),
 				strconv.Itoa(g.IssuesClosed30d),
+				escapeMarkdown(g.License),
 				escapeMarkdown(r.Error),
 			); err != nil {
 				return err
@@ -95,17 +96,18 @@ func Markdown(w io.Writer, results []provider.Result) error {
 				return err
 			}
 		}
-		if _, err := fmt.Fprintln(w, "| target | weekly_downloads | latest_version | last_publish_days | dependencies_count | license | error |"); err != nil {
+		if _, err := fmt.Fprintln(w, "| target | weekly_downloads | monthly_downloads | latest_version | last_publish_days | dependencies_count | license | error |"); err != nil {
 			return err
 		}
-		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|---|"); err != nil {
+		if _, err := fmt.Fprintln(w, "|---|---|---|---|---|---|---|---|"); err != nil {
 			return err
 		}
 		for _, r := range npmResults {
 			n := r.NPM
-			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s |\n",
+			if _, err := fmt.Fprintf(w, "| %s | %s | %s | %s | %s | %s | %s | %s |\n",
 				escapeMarkdown(r.Target),
 				strconv.Itoa(n.WeeklyDownloads),
+				strconv.Itoa(n.MonthlyDownloads),
 				escapeMarkdown(n.LatestVersion),
 				strconv.Itoa(n.LastPublishDays),
 				strconv.Itoa(n.DependenciesCount),

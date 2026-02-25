@@ -54,10 +54,16 @@ func (p *Provider) Fetch(ctx context.Context, identifier string) (provider.Resul
 		}, nil
 	}
 
+	var license string
+	if lic := repoInfo.GetLicense(); lic != nil {
+		license = lic.GetSPDXID()
+	}
+
 	metrics := &provider.GitHubMetrics{
 		Stars:      repoInfo.GetStargazersCount(),
 		Forks:      repoInfo.GetForksCount(),
 		OpenIssues: repoInfo.GetOpenIssuesCount(),
+		License:    license,
 	}
 
 	errs := p.fetchParallel(ctx, owner, repo, metrics)
