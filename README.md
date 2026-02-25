@@ -5,10 +5,14 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/yutakobayashidev/repiq)](go.mod)
 [![DeepWiki](https://img.shields.io/badge/DeepWiki-yutakobayashidev%2Frepiq-blue.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAyCAYAAAAnWDnqAAAAAXNSR0IArs4c6QAAA05JREFUaEPtmUtyEzEQhtWTQyQLHNak2AB7ZnyXZMEjXMGeK/AIi+QuHrMnbChYY7MIh8g01fJoopFb0uhhEqqcbWTp06/uv1saEDv4O3n3dV60RfP947Mm9/SQc0ICFQgzfc4CYZoTPAswgSJCCUJUnAAoRHOAUOcATwbmVLWdGoH//PB8mnKqScAhsD0kYP3j/Yt5LPQe2KvcXmGvRHcDnpxfL2zOYJ1mFwrryWTz0advv1Ut4CJgf5uhDuDj5eUcAUoahrdY/56ebRWeraTjMt/00Sh3UDtjgHtQNHwcRGOC98BJEAEymycmYcWwOprTgcB6VZ5JK5TAJ+fXGLBm3FDAmn6oPPjR4rKCAoJCal2eAiQp2x0vxTPB3ALO2CRkwmDy5WohzBDwSEFKRwPbknEggCPB/imwrycgxX2NzoMCHhPkDwqYMr9tRcP5qNrMZHkVnOjRMWwLCcr8ohBVb1OMjxLwGCvjTikrsBOiA6fNyCrm8V1rP93iVPpwaE+gO0SsWmPiXB+jikdf6SizrT5qKasx5j8ABbHpFTx+vFXp9EnYQmLx02h1QTTrl6eDqxLnGjporxl3NL3agEvXdT0WmEost648sQOYAeJS9Q7bfUVoMGnjo4AZdUMQku50McDcMWcBPvr0SzbTAFDfvJqwLzgxwATnCgnp4wDl6Aa+Ax283gghmj+vj7feE2KBBRMW3FzOpLOADl0Isb5587h/U4gGvkt5v60Z1VLG8BhYjbzRwyQZemwAd6cCR5/XFWLYZRIMpX39AR0tjaGGiGzLVyhse5C9RKC6ai42ppWPKiBagOvaYk8lO7DajerabOZP46Lby5wKjw1HCRx7p9sVMOWGzb/vA1hwiWc6jm3MvQDTogQkiqIhJV0nBQBTU+3okKCFDy9WwferkHjtxib7t3xIUQtHxnIwtx4mpg26/HfwVNVDb4oI9RHmx5WGelRVlrtiw43zboCLaxv46AZeB3IlTkwouebTr1y2NjSpHz68WNFjHvupy3q8TFn3Hos2IAk4Ju5dCo8B3wP7VPr/FGaKiG+T+v+TQqIrOqMTL1VdWV1DdmcbO8KXBz6esmYWYKPwDL5b5FA1a0hwapHiom0r/cKaoqr+27/XcrS5UwSMbQAAAABJRU5ErkJggg==)](https://deepwiki.com/yutakobayashidev/repiq)
 
-> Fetch objective metrics for OSS repositories and packages.
-> Built for AI agents that need fast, non-reasoning data retrieval.
->
-> No judgments, no recommendations, no scores -- just numbers.
+AI agents pick libraries by guessing. repiq gives them real data instead.
+
+```
+You: "Add an HTTP client library"
+Agent: repiq npm:axios npm:ky npm:got → compares downloads, maintenance, dependencies → recommends with evidence
+```
+
+repiq fetches stars, downloads, commit activity, and more from GitHub, npm, PyPI, crates.io, and Go Modules. It returns raw JSON -- no opinions, no scores. The agent reasons. You decide.
 
 ## Install
 
@@ -46,11 +50,31 @@ repiq github:facebook/react
 ]
 ```
 
-Mix providers in a single command:
+## Use Cases
+
+**Compare libraries for the same task**
 
 ```bash
-repiq github:facebook/react npm:react pypi:flask crates:serde go:golang.org/x/net
+repiq npm:express npm:fastify npm:hono
 ```
+
+An agent can compare `weekly_downloads`, `last_commit_days`, and `dependencies_count` to recommend the best fit.
+
+**Check if a repo is still maintained**
+
+```bash
+repiq github:some-org/some-lib
+```
+
+`last_commit_days: 400` and `issues_closed_30d: 0` tells the agent this project may be abandoned.
+
+**Cross-ecosystem comparison**
+
+```bash
+repiq npm:zod pypi:pydantic crates:serde
+```
+
+Compare equivalent packages across languages using downloads, dependency count, and license.
 
 ## Supported Providers
 
